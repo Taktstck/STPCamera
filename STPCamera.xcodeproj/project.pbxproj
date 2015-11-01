@@ -1,0 +1,411 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		12B296051BE4B390007BE458 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296041BE4B390007BE458 /* CoreLocation.framework */; };
+		12B296071BE4B397007BE458 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296061BE4B397007BE458 /* CoreMotion.framework */; };
+		12B296091BE4B39C007BE458 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296081BE4B39C007BE458 /* AVFoundation.framework */; };
+		12B296101BE4B3DD007BE458 /* STPCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B2960B1BE4B3DD007BE458 /* STPCameraManager.m */; };
+		12B296111BE4B3DD007BE458 /* STPCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B2960D1BE4B3DD007BE458 /* STPCameraViewController.m */; };
+		12B296121BE4B3DD007BE458 /* STPCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B2960F1BE4B3DD007BE458 /* STPCameraView.m */; };
+		12B296141BE4B471007BE458 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296131BE4B471007BE458 /* ImageIO.framework */; };
+		12B296171BE4B771007BE458 /* NSDateFormatter+Exif.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B296161BE4B771007BE458 /* NSDateFormatter+Exif.m */; };
+		12B2961A1BE4EC6D007BE458 /* STPPreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B296191BE4EC6D007BE458 /* STPPreviewViewController.m */; };
+		8C8CA1981B540901009A6271 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8CA1971B540901009A6271 /* main.m */; };
+		8C8CA19B1B540901009A6271 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8CA19A1B540901009A6271 /* AppDelegate.m */; };
+		8C8CA1A31B540901009A6271 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8C8CA1A21B540901009A6271 /* Assets.xcassets */; };
+		8C8CA1A61B540901009A6271 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C8CA1A41B540901009A6271 /* LaunchScreen.storyboard */; };
+		DC30DA2E0D011D4E880DE0C1 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3F7708D5CEE6B9365779D80 /* libPods.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		12B296041BE4B390007BE458 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		12B296061BE4B397007BE458 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		12B296081BE4B39C007BE458 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		12B2960A1BE4B3DD007BE458 /* STPCameraManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraManager.h; sourceTree = "<group>"; };
+		12B2960B1BE4B3DD007BE458 /* STPCameraManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraManager.m; sourceTree = "<group>"; };
+		12B2960C1BE4B3DD007BE458 /* STPCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraViewController.h; sourceTree = "<group>"; };
+		12B2960D1BE4B3DD007BE458 /* STPCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraViewController.m; sourceTree = "<group>"; };
+		12B2960E1BE4B3DD007BE458 /* STPCameraView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraView.h; sourceTree = "<group>"; };
+		12B2960F1BE4B3DD007BE458 /* STPCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraView.m; sourceTree = "<group>"; };
+		12B296131BE4B471007BE458 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		12B296151BE4B771007BE458 /* NSDateFormatter+Exif.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+Exif.h"; sourceTree = "<group>"; };
+		12B296161BE4B771007BE458 /* NSDateFormatter+Exif.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+Exif.m"; sourceTree = "<group>"; };
+		12B296181BE4EC6D007BE458 /* STPPreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPPreviewViewController.h; sourceTree = "<group>"; };
+		12B296191BE4EC6D007BE458 /* STPPreviewViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPPreviewViewController.m; sourceTree = "<group>"; };
+		5241C2D935788B9392ED7062 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		6CA11E638CB5C78C5D09F539 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		8C8CA1931B540901009A6271 /* STPCamera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = STPCamera.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C8CA1971B540901009A6271 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		8C8CA1991B540901009A6271 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		8C8CA19A1B540901009A6271 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		8C8CA1A21B540901009A6271 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8C8CA1A51B540901009A6271 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8C8CA1A71B540901009A6271 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C3F7708D5CEE6B9365779D80 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8C8CA1901B540901009A6271 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				12B296141BE4B471007BE458 /* ImageIO.framework in Frameworks */,
+				12B296091BE4B39C007BE458 /* AVFoundation.framework in Frameworks */,
+				12B296071BE4B397007BE458 /* CoreMotion.framework in Frameworks */,
+				12B296051BE4B390007BE458 /* CoreLocation.framework in Frameworks */,
+				DC30DA2E0D011D4E880DE0C1 /* libPods.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8C8CA18A1B540901009A6271 = {
+			isa = PBXGroup;
+			children = (
+				8C8CA1951B540901009A6271 /* STPCamera */,
+				8C8CA1941B540901009A6271 /* Products */,
+				DF19AC2521F2C1F79788206C /* Pods */,
+				E75011F5D1D3E6378DB35129 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		8C8CA1941B540901009A6271 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8C8CA1931B540901009A6271 /* STPCamera.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8C8CA1951B540901009A6271 /* STPCamera */ = {
+			isa = PBXGroup;
+			children = (
+				8C8CA1991B540901009A6271 /* AppDelegate.h */,
+				8C8CA19A1B540901009A6271 /* AppDelegate.m */,
+				12B2960A1BE4B3DD007BE458 /* STPCameraManager.h */,
+				12B2960B1BE4B3DD007BE458 /* STPCameraManager.m */,
+				12B2960C1BE4B3DD007BE458 /* STPCameraViewController.h */,
+				12B2960D1BE4B3DD007BE458 /* STPCameraViewController.m */,
+				12B296181BE4EC6D007BE458 /* STPPreviewViewController.h */,
+				12B296191BE4EC6D007BE458 /* STPPreviewViewController.m */,
+				12B2960E1BE4B3DD007BE458 /* STPCameraView.h */,
+				12B2960F1BE4B3DD007BE458 /* STPCameraView.m */,
+				12B296151BE4B771007BE458 /* NSDateFormatter+Exif.h */,
+				12B296161BE4B771007BE458 /* NSDateFormatter+Exif.m */,
+				8C8CA1A21B540901009A6271 /* Assets.xcassets */,
+				8C8CA1A41B540901009A6271 /* LaunchScreen.storyboard */,
+				8C8CA1A71B540901009A6271 /* Info.plist */,
+				8C8CA1961B540901009A6271 /* Supporting Files */,
+			);
+			path = STPCamera;
+			sourceTree = "<group>";
+		};
+		8C8CA1961B540901009A6271 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				8C8CA1971B540901009A6271 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		DF19AC2521F2C1F79788206C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5241C2D935788B9392ED7062 /* Pods.debug.xcconfig */,
+				6CA11E638CB5C78C5D09F539 /* Pods.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		E75011F5D1D3E6378DB35129 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				12B296131BE4B471007BE458 /* ImageIO.framework */,
+				12B296081BE4B39C007BE458 /* AVFoundation.framework */,
+				12B296061BE4B397007BE458 /* CoreMotion.framework */,
+				12B296041BE4B390007BE458 /* CoreLocation.framework */,
+				C3F7708D5CEE6B9365779D80 /* libPods.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8C8CA1921B540901009A6271 /* STPCamera */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8C8CA1AA1B540901009A6271 /* Build configuration list for PBXNativeTarget "STPCamera" */;
+			buildPhases = (
+				C6A2F885EA8F326DE1A55D15 /* Check Pods Manifest.lock */,
+				8C8CA18F1B540901009A6271 /* Sources */,
+				8C8CA1901B540901009A6271 /* Frameworks */,
+				8C8CA1911B540901009A6271 /* Resources */,
+				CEC2555422081C233B237B2B /* Copy Pods Resources */,
+				CE150161CB01290C0D7E063F /* Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = STPCamera;
+			productName = STPCamera;
+			productReference = 8C8CA1931B540901009A6271 /* STPCamera.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8C8CA18B1B540901009A6271 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "Stamp inc";
+				TargetAttributes = {
+					8C8CA1921B540901009A6271 = {
+						CreatedOnToolsVersion = 7.0;
+					};
+				};
+			};
+			buildConfigurationList = 8C8CA18E1B540901009A6271 /* Build configuration list for PBXProject "STPCamera" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8C8CA18A1B540901009A6271;
+			productRefGroup = 8C8CA1941B540901009A6271 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8C8CA1921B540901009A6271 /* STPCamera */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8C8CA1911B540901009A6271 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8C8CA1A61B540901009A6271 /* LaunchScreen.storyboard in Resources */,
+				8C8CA1A31B540901009A6271 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C6A2F885EA8F326DE1A55D15 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		CE150161CB01290C0D7E063F /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CEC2555422081C233B237B2B /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8C8CA18F1B540901009A6271 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				12B296111BE4B3DD007BE458 /* STPCameraViewController.m in Sources */,
+				8C8CA19B1B540901009A6271 /* AppDelegate.m in Sources */,
+				12B296121BE4B3DD007BE458 /* STPCameraView.m in Sources */,
+				12B296171BE4B771007BE458 /* NSDateFormatter+Exif.m in Sources */,
+				8C8CA1981B540901009A6271 /* main.m in Sources */,
+				12B296101BE4B3DD007BE458 /* STPCameraManager.m in Sources */,
+				12B2961A1BE4EC6D007BE458 /* STPPreviewViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		8C8CA1A41B540901009A6271 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8C8CA1A51B540901009A6271 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		8C8CA1A81B540901009A6271 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		8C8CA1A91B540901009A6271 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8C8CA1AB1B540901009A6271 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5241C2D935788B9392ED7062 /* Pods.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = STPCamera/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = inc.stamp.STPCamera;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		8C8CA1AC1B540901009A6271 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6CA11E638CB5C78C5D09F539 /* Pods.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = STPCamera/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = inc.stamp.STPCamera;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8C8CA18E1B540901009A6271 /* Build configuration list for PBXProject "STPCamera" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8C8CA1A81B540901009A6271 /* Debug */,
+				8C8CA1A91B540901009A6271 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8C8CA1AA1B540901009A6271 /* Build configuration list for PBXNativeTarget "STPCamera" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8C8CA1AB1B540901009A6271 /* Debug */,
+				8C8CA1AC1B540901009A6271 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8C8CA18B1B540901009A6271 /* Project object */;
+}
