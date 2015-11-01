@@ -10,6 +10,7 @@
 
 @interface STPCameraViewController : UIViewController
 
+
 + (void)requestAccessCameraCompletionHandler:(void (^)(BOOL authorized))handler;
 - (void)cameraViewStartRecording;
 

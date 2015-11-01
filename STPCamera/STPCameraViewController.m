@@ -9,17 +9,19 @@
 #import "STPCameraViewController.h"
 #import "STPCameraManager.h"
 #import "STPCameraView.h"
+#import "STPCameraPreviewController.h"
 
 @interface STPCameraViewController () <STPCameraManagerDelegate, STPCameraViewDelegate>
 
 @property (nonatomic) STPCameraView *cameraView;
 @property (nonatomic) UIView *preview;
+
 @property (nonatomic) AVCaptureVideoPreviewLayer *captureVideoPreviewLayer;
+@property (nonatomic) STPCameraPreviewController *previewController;
 
 @end
 
 @implementation STPCameraViewController
-
 
 + (void)requestAccessCameraCompletionHandler:(void (^)(BOOL authorized))handler
 {
@@ -116,6 +118,10 @@
 {
     [super viewDidLoad];
     [self setupAVCapture];
+    
+    [self addChildViewController:self.previewController];
+    [self.view addSubview:self.previewController.view];
+    [self.previewController didMoveToParentViewController:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -134,6 +140,16 @@
     _cameraView = [[STPCameraView alloc] initWithFrame:self.view.bounds];
     _cameraView.delegate = self;
     return _cameraView;
+}
+
+- (STPCameraPreviewController *)previewController
+{
+    if (_previewController) {
+        return _previewController;
+    }
+    _previewController = [STPCameraPreviewController new];
+    _previewController.view.frame = UIEdgeInsetsInsetRect(self.view.bounds, UIEdgeInsetsMake(self.cameraView.topToolbar.bounds.size.height, 0, self.cameraView.bottomToolbar.bounds.size.height, 0));
+    return _previewController;
 }
 
 #pragma mark - Camera view delegate
@@ -175,14 +191,63 @@
     
     image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
+    
+    /*
+     CGRect rect = rand() % 2 == 0 ? CGRectMake(0, 0, 400, 300) : CGRectMake(0, 0, 300, 400);
+     UIGraphicsBeginImageContextWithOptions(rect.size, NO, 1.0f);
+     [[UIColor colorWithHue:(float)(rand() % 100) / 100 saturation:1.0 brightness:1.0 alpha:1.0] setFill];
+     UIRectFillUsingBlendMode(rect, kCGBlendModeNormal);
+     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+     UIGraphicsEndImageContext();
+     */
+    
 #else
+    
     [[STPCameraManager sharedManager] captureImageWithCompletionHandler:^(UIImage *image, CLLocation *location, NSDictionary *metaData, NSError *error) {
         if (error) {
             return ;
         }
         
         if (image) {
+            __block NSString *localIdentifier;
+            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                // Create PHAsset from UIImage
+                PHAssetChangeRequest *assetChangeRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+                
+                PHObjectPlaceholder *assetPlaceholder = assetChangeRequest.placeholderForCreatedAsset;
+                localIdentifier = assetPlaceholder.localIdentifier;
+                
+                // Add PHAsset to PHAssetCollection
+                /*
+                PHAssetCollectionChangeRequest *assetCollectionChangeRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:self.previewController.assetCollection];
+                [assetCollectionChangeRequest addAssets:@[assetPlaceholder]];
+                */
+            } completionHandler:^(BOOL success, NSError *error) {
+                if (!success) {
+                    NSLog(@"creating Asset Error: %@", error);
+                } else {
 
+                    PHFetchResult *assets = [PHAsset fetchAssetsWithLocalIdentifiers:@[localIdentifier] options:nil];
+                    PHAsset *asset = assets[0];
+                    if (location) {
+                        // add location data
+                        if ([asset canPerformEditOperation:PHAssetEditOperationProperties]) {
+                            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                                PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
+                                [request setLocation:location];
+                                //[request setCreationDate:[NSDate date]];
+                            } completionHandler:^(BOOL success, NSError *error) {
+                                if (success) {
+                                    NSLog(@"%s add location data success", __PRETTY_FUNCTION__);
+                                }
+                            }];
+                        }
+                    } else {
+                        NSLog(@"latitude or longitude value is nil");
+                    }
+                }
+            }];
+            
         }
     }];
 #endif
@@ -201,11 +266,6 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
-- (void)dealloc
-{
-    [[STPCameraManager sharedManager] terminate];
-}
-
 #pragma mark - memory
 
 - (void)didReceiveMemoryWarning {
@@ -213,6 +273,9 @@
     // Dispose of any resources that can be recreated.
 }
 
-
+- (void)dealloc
+{
+    [[STPCameraManager sharedManager] terminate];
+}
 
 @end

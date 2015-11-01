@@ -11,6 +11,8 @@
 @import CoreMotion;
 @import CoreLocation;
 @import ImageIO;
+@import Photos;
+@import MobileCoreServices;
 
 @protocol STPCameraManagerDelegate;
 @interface STPCameraManager : NSObject <CLLocationManagerDelegate>

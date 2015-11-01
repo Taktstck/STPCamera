@@ -23,8 +23,8 @@
 @property (nonatomic) CALayer *focusBox;
 @property (nonatomic) CALayer *exposeBox;
 
-@property (nonatomic) UIView *upperToolbar;
-@property (nonatomic) UIView *underToolbar;
+@property (nonatomic, readwrite) UIView *topToolbar;
+@property (nonatomic, readwrite) UIView *bottomToolbar;
 @property (nonatomic) UIView *contentView;
 @property (nonatomic) UIView *shutterView;
 
@@ -44,8 +44,8 @@ static inline CGFloat POPTransition(CGFloat progress, CGFloat startValue, CGFloa
 static CGFloat triggerButtonRadius = 24;
 static CGFloat triggerButtonOutlineRadius = 30;
 static CGFloat kLayerRadius = 40;
-static CGFloat kUpperToolbarHeight = 40;
-static CGFloat kUnderToolbarHeight = 100;
+static CGFloat ktopToolbarHeight = 40;
+static CGFloat kbottomToolbarHeight = 80;
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)aDecoder
 {
@@ -84,24 +84,24 @@ static CGFloat kUnderToolbarHeight = 100;
     [self addSubview:self.shutterView];
     [self addSubview:self.contentView];
     
-    [self.contentView addSubview:self.upperToolbar];
-    [self.upperToolbar addSubview:self.flashButton];
-    [self.upperToolbar addSubview:self.cameraButton];
+    [self.contentView addSubview:self.topToolbar];
+    [self.topToolbar addSubview:self.flashButton];
+    [self.topToolbar addSubview:self.cameraButton];
     
-    [self.contentView addSubview:self.underToolbar];
-    [self.underToolbar addSubview:self.cancelButton];
-    [self.underToolbar addSubview:self.triggerButton];
-    [self.underToolbar.layer addSublayer:self.triggerButtonOutline];
+    [self.contentView addSubview:self.bottomToolbar];
+    [self.bottomToolbar addSubview:self.cancelButton];
+    [self.bottomToolbar addSubview:self.triggerButton];
+    [self.bottomToolbar.layer addSublayer:self.triggerButtonOutline];
 }
 
 - (void)layoutSubviews
 {
     [super layoutSubviews];
     
-    self.flashButton.center = CGPointMake(self.insets.left + self.flashButton.bounds.size.width/2, self.upperToolbar.center.y);
-    self.cameraButton.center = CGPointMake(self.bounds.size.width - self.cameraButton.bounds.size.width/2 - self.insets.right, self.upperToolbar.center.y);
+    self.flashButton.center = CGPointMake(self.insets.left + self.flashButton.bounds.size.width/2, self.topToolbar.center.y);
+    self.cameraButton.center = CGPointMake(self.bounds.size.width - self.cameraButton.bounds.size.width/2 - self.insets.right, self.topToolbar.center.y);
     
-    self.triggerButton.center = CGPointMake(self.underToolbar.bounds.size.width/2, self.underToolbar.bounds.size.height/2);
+    self.triggerButton.center = CGPointMake(self.bottomToolbar.bounds.size.width/2, self.bottomToolbar.bounds.size.height/2);
     self.triggerButtonOutline.position = self.triggerButton.center;
     self.cancelButton.center = CGPointMake(self.bounds.size.width - self.cancelButton.bounds.size.width, self.triggerButton.center.y);
     
@@ -139,26 +139,26 @@ static CGFloat kUnderToolbarHeight = 100;
 
 #pragma mark - element
 
-- (UIView *)upperToolbar
+- (UIView *)topToolbar
 {
-    if (_upperToolbar) {
-        return _upperToolbar;
+    if (_topToolbar) {
+        return _topToolbar;
     }
     CGSize screenSize = [UIScreen mainScreen].bounds.size;
-    _upperToolbar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenSize.width, kUpperToolbarHeight)];
-    _upperToolbar.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
-    return _upperToolbar;
+    _topToolbar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenSize.width, ktopToolbarHeight)];
+    _topToolbar.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
+    return _topToolbar;
 }
 
-- (UIView *)underToolbar
+- (UIView *)bottomToolbar
 {
-    if (_underToolbar) {
-        return _underToolbar;
+    if (_bottomToolbar) {
+        return _bottomToolbar;
     }
     CGSize screenSize = [UIScreen mainScreen].bounds.size;
-    _underToolbar = [[UIView alloc] initWithFrame:CGRectMake(0, screenSize.height - kUnderToolbarHeight, screenSize.width, kUnderToolbarHeight)];
-    _underToolbar.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
-    return _underToolbar;
+    _bottomToolbar = [[UIView alloc] initWithFrame:CGRectMake(0, screenSize.height - kbottomToolbarHeight, screenSize.width, kbottomToolbarHeight)];
+    _bottomToolbar.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
+    return _bottomToolbar;
 }
 
 - (UIButton *)triggerButton

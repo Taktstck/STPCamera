@@ -14,8 +14,10 @@
 
 @protocol STPCameraViewDelegate;
 @interface STPCameraView : UIView
-
+@property (nonatomic, readonly) UIView *topToolbar;
+@property (nonatomic, readonly) UIView *bottomToolbar;
 @property (nonatomic) id <STPCameraViewDelegate> delegate;
+
 - (void)drawAtPoint:(CGPoint)point remove:(BOOL)remove;
 
 @end
@@ -24,6 +26,7 @@
 - (void)cameraViewStartRecording;
 - (void)changeCamera;
 - (void)flashMode:(AVCaptureFlashMode)flashMode;
+
 - (void)cancel;
 @optional
 - (void)cameraView:(STPCameraView *)cameraView focusAtPoint:(CGPoint)point;
