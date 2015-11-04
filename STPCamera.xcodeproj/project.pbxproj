@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1291CBE91BE598780018B8D5 /* STPMediaManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1291CBE81BE598780018B8D5 /* STPMediaManager.m */; };
 		1291CBED1BE5A5A90018B8D5 /* STPCameraPreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1291CBEC1BE5A5A90018B8D5 /* STPCameraPreviewController.m */; };
 		1291CBEF1BE5B06E0018B8D5 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1291CBEE1BE5B06E0018B8D5 /* Photos.framework */; };
 		1291CBF61BE5DA660018B8D5 /* CIImage+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 1291CBF11BE5DA660018B8D5 /* CIImage+Convenience.m */; };
@@ -30,8 +29,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1291CBE71BE598780018B8D5 /* STPMediaManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPMediaManager.h; sourceTree = "<group>"; };
-		1291CBE81BE598780018B8D5 /* STPMediaManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPMediaManager.m; sourceTree = "<group>"; };
 		1291CBEB1BE5A5A90018B8D5 /* STPCameraPreviewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraPreviewController.h; sourceTree = "<group>"; };
 		1291CBEC1BE5A5A90018B8D5 /* STPCameraPreviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraPreviewController.m; sourceTree = "<group>"; };
 		1291CBEE1BE5B06E0018B8D5 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
@@ -126,8 +123,6 @@
 				12B2960B1BE4B3DD007BE458 /* STPCameraManager.m */,
 				12B2960C1BE4B3DD007BE458 /* STPCameraViewController.h */,
 				12B2960D1BE4B3DD007BE458 /* STPCameraViewController.m */,
-				1291CBE71BE598780018B8D5 /* STPMediaManager.h */,
-				1291CBE81BE598780018B8D5 /* STPMediaManager.m */,
 				12B2960E1BE4B3DD007BE458 /* STPCameraView.h */,
 				12B2960F1BE4B3DD007BE458 /* STPCameraView.m */,
 				1291CBEB1BE5A5A90018B8D5 /* STPCameraPreviewController.h */,
@@ -304,7 +299,6 @@
 				1291CBF61BE5DA660018B8D5 /* CIImage+Convenience.m in Sources */,
 				8C8CA1981B540901009A6271 /* main.m in Sources */,
 				12B296101BE4B3DD007BE458 /* STPCameraManager.m in Sources */,
-				1291CBE91BE598780018B8D5 /* STPMediaManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

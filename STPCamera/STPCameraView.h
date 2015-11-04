@@ -12,9 +12,16 @@
 #import <pop/POP.h>
 #import <pop/POPLayerExtras.h>
 
+typedef NS_ENUM(NSInteger, STPCameraMode) {
+    STPCameraModeShot = 0,
+    STPCameraModeBurst,
+    STPCameraModeVideo,
+    STPCameraModeCount
+};
+
 @protocol STPCameraViewDelegate;
 @interface STPCameraView : UIView
-@property (nonatomic, readonly) UIView *topToolbar;
+@property (nonatomic, readonly) UIToolbar *topToolbar;
 @property (nonatomic, readonly) UIView *bottomToolbar;
 @property (nonatomic) id <STPCameraViewDelegate> delegate;
 
@@ -23,13 +30,19 @@
 @end
 
 @protocol STPCameraViewDelegate <NSObject>
-- (void)cameraViewStartRecording;
-- (void)changeCamera;
-- (void)flashMode:(AVCaptureFlashMode)flashMode;
 
-- (void)cancel;
 @optional
-- (void)cameraView:(STPCameraView *)cameraView focusAtPoint:(CGPoint)point;
-- (void)cameraView:(STPCameraView *)cameraView exposeAtPoint:(CGPoint)point;
+- (BOOL)cameraViewShouldBeginRecording:(STPCameraView *)cameraView;
+- (BOOL)cameraViewShouldBeginOptimize:(STPCameraView *)cameraView;
+- (BOOL)cameraViewShouldChangeCaptureDevicePosition:(STPCameraView *)cameraView;
+- (BOOL)cameraViewShouldChangeCaptureFlashMode:(STPCameraView *)cameraView;
+
+@required
+- (AVCaptureFlashMode)captureFlashMode;
+- (AVCaptureDevicePosition)captureDevicePosition;
+
+- (BOOL)cameraViewStartRecording:(STPCameraMode)cameraMode;
 - (void)cameraView:(STPCameraView *)cameraView optimizeAtPoint:(CGPoint)point;
+- (void)cameraView:(STPCameraView *)cameraView changeCaptureDevicePosition:(AVCaptureDevicePosition)captureDevicePosition;
+- (void)cameraView:(STPCameraView *)cameraView changeCaptureFlashMode:(AVCaptureFlashMode)flashMode;
 @end
