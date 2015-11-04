@@ -40,11 +40,6 @@
 - (void)setupAVCaptureCompletionHandler:(void (^)(AVCaptureVideoPreviewLayer *previewLayer))handler;
 - (void)terminate;
 
-- (BOOL)canChangeCaptureDevicePosition;
-- (BOOL)canChangeCaptureFlashMode;
-- (BOOL)canOptimize;
-- (BOOL)canCaptureImage;
-
 - (void)setCaptureDevicePosition:(AVCaptureDevicePosition)devicePosition;
 - (void)setCaptureFlashMode:(AVCaptureFlashMode)flashMode;
 - (void)setOptimizeAtPoint:(CGPoint)point;
@@ -60,7 +55,6 @@
 - (void)cameraManager:(STPCameraManager *)cameraManager didFailWithError:(NSError *)error;
 - (void)cameraManager:(STPCameraManager *)cameraManager didChangeCaptureDevicePosition:(AVCaptureDevicePosition)devicePosition;
 - (void)cameraManager:(STPCameraManager *)cameraManager didChangeFlashMode:(AVCaptureFlashMode)flashMode;
-- (void)cameraManager:(STPCameraManager *)cameraManager didOptimizeFocus:(BOOL)focus expose:(BOOL)expose; //FIXME
-
+//- (void)cameraManager:(STPCameraManager *)cameraManager didOptimizeFocus:(BOOL)focus expose:(BOOL)expose; //FIXME
 
 @end
