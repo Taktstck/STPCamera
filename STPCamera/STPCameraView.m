@@ -8,6 +8,26 @@
 
 #import "STPCameraView.h"
 
+@implementation STPCameraViewToolbar
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.opaque = NO;
+        self.translucent = YES;
+        self.backgroundColor = [UIColor clearColor];
+    }
+    return self;
+}
+
+- (void)drawRect:(CGRect)rect
+{
+    
+}
+
+@end
+
 @interface STPCameraView ()
 
 @property (nonatomic) UIEdgeInsets insets;
@@ -21,7 +41,7 @@
 @property (nonatomic) CALayer *exposeBox;
 
 // top toolbar
-@property (nonatomic, readwrite) UIToolbar *topToolbar;
+@property (nonatomic, readwrite) STPCameraViewToolbar *topToolbar;
 @property (nonatomic) UIBarButtonItem *flexBarButtonItem;
 @property (nonatomic) UIBarButtonItem *fixedBarButtonItem;
 
@@ -60,7 +80,6 @@ static inline CGFloat POPTransition(CGFloat progress, CGFloat startValue, CGFloa
 static CGFloat triggerButtonRadius = 24;
 static CGFloat triggerButtonOutlineRadius = 30;
 static CGFloat kLayerRadius = 40;
-static CGFloat ktopToolbarHeight = 40;
 static CGFloat kbottomToolbarHeight = 80;
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)aDecoder
@@ -144,12 +163,13 @@ static CGFloat kbottomToolbarHeight = 80;
 
 #pragma mark - top toolbar
 
-- (UIToolbar *)topToolbar
+- (STPCameraViewToolbar *)topToolbar
 {
     if (_topToolbar) {
         return _topToolbar;
     }
-    _topToolbar = [[UIToolbar alloc] initWithFrame:CGRectZero];
+    _topToolbar = [[STPCameraViewToolbar alloc] initWithFrame:CGRectZero];
+    _topToolbar.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
     [_topToolbar setItems:@[self.fixedBarButtonItem, self.flashBarButtonItem, self.flexBarButtonItem, self.devicePositionBarButtonItem,self.fixedBarButtonItem]];
     [_topToolbar sizeToFit];
     return _topToolbar;
@@ -307,6 +327,7 @@ static CGFloat kbottomToolbarHeight = 80;
         return _triggerButton;
     }
     _triggerButton = [[UIView alloc] initWithFrame:(CGRect){ 0, 0, triggerButtonRadius * 2, triggerButtonRadius * 2}];
+    _triggerButton.backgroundColor = [UIColor whiteColor];
     [_triggerButton.layer setCornerRadius:triggerButtonRadius];
     [_triggerButton setCenter:self.triggerButtonCenter];
     [_triggerButton addGestureRecognizer:self.triggerTapGestureRecognizer];
@@ -434,9 +455,15 @@ static CGFloat kbottomToolbarHeight = 80;
 - (void)tapFlashModeBarButtonItem:(UIBarButtonItem *)barButtonItem
 {
     if (barButtonItem == self.flashBarButtonItem) {
-        [self.topToolbar setItems:@[self.flashAutoBarButtonItem, self.flashOnBarButtonItem, self.flashOffBarButtonItem] animated:YES];
+        [self.topToolbar setItems:@[self.flexBarButtonItem,
+                                    self.flashAutoBarButtonItem,
+                                    self.flexBarButtonItem,
+                                    self.flashOnBarButtonItem,
+                                    self.flexBarButtonItem,
+                                    self.flashOffBarButtonItem,
+                                    self.flexBarButtonItem] animated:YES];
     } else {
-        if ([self.delegate respondsToSelector:@selector(cameraView:changeCaptureFlashMode:)]) {
+        if ([self.delegate respondsToSelector:@selector(cameraViewShouldChangeCaptureFlashMode:)]) {
             if ([self.delegate cameraViewShouldChangeCaptureFlashMode:self]) {
                 [self changeFlashMode:barButtonItem];
             }
@@ -461,7 +488,6 @@ static CGFloat kbottomToolbarHeight = 80;
     
     [self.delegate cameraView:self changeCaptureFlashMode:captureFlashMode];
 }
-
 
 #pragma mark -
 

@@ -20,41 +20,47 @@
 @property (nonatomic, weak) id <STPCameraManagerDelegate> delegate;
 
 @property (nonatomic) AVCaptureSession *captureSession;
-@property (nonatomic) AVCaptureDeviceInput *deviceInput;
-@property (nonatomic) AVCaptureStillImageOutput *stillImageOut;
+@property (nonatomic) AVCaptureDeviceInput *captureDeviceInput;
+@property (nonatomic) AVCaptureStillImageOutput *captureStillImageOutput;
+
 @property (nonatomic, readonly) UIDeviceOrientation deviceOrientation;
 @property (nonatomic, readonly) UIInterfaceOrientation interfaceOrientation;
 
-@property (nonatomic, readonly) BOOL hasMultipleCameras;
+@property (nonatomic, readonly) BOOL hasMultipleCaptureDevices;
 @property (nonatomic, readonly) BOOL hasFlash;
-@property (nonatomic, readonly) BOOL isTraking;
+
+@property (nonatomic, readonly) AVCaptureDevicePosition devicePosition;
+@property (nonatomic, readonly) AVCaptureFlashMode flashMode;
 
 @property (nonatomic, readonly) CMMotionManager* motionManager;
 @property (nonatomic, readonly) CLLocationManager *locationManager;
 
 
 + (instancetype)sharedManager;
-- (void)start;
-
-- (void)changeCamara;
-- (void)setFlashMode:(AVCaptureFlashMode)flashMode;
-
-
-- (void)captureImageWithCompletionHandler:(void (^)(UIImage *image, CLLocation *location, NSDictionary *metaData, NSError *error))handler;
-- (CGPoint)convertToPointOfInterestFrom:(CGRect)frame coordinates:(CGPoint)viewCoordinates layer:(AVCaptureVideoPreviewLayer *)layer;
-
-
-- (void)optimizeAtPoint:(CGPoint)point;
-- (void)focusAtPoint:(CGPoint)point;
-- (void)exposureAtPoint:(CGPoint)point;
-
+- (void)setupAVCaptureCompletionHandler:(void (^)(AVCaptureVideoPreviewLayer *previewLayer))handler;
 - (void)terminate;
+
+- (BOOL)canChangeCaptureDevicePosition;
+- (BOOL)canChangeCaptureFlashMode;
+- (BOOL)canOptimize;
+- (BOOL)canCaptureImage;
+
+- (void)setCaptureDevicePosition:(AVCaptureDevicePosition)devicePosition;
+- (void)setCaptureFlashMode:(AVCaptureFlashMode)flashMode;
+- (void)setOptimizeAtPoint:(CGPoint)point;
+- (void)captureImageWithCompletionHandler:(void (^)(UIImage *image, CLLocation *location, NSDictionary *metaData, NSError *error))handler;
+
+- (CGPoint)convertToPointOfInterestFrom:(CGRect)frame coordinates:(CGPoint)viewCoordinates layer:(AVCaptureVideoPreviewLayer *)layer;
 
 @end
 
 @protocol STPCameraManagerDelegate <NSObject>
 
-- (void)cameraManager:(STPCameraManager *)manager readyForLocationManager:(CLLocationManager *)locationManager;
-- (void)cameraManager:(STPCameraManager *)manager error:(NSError *)error;
+- (void)cameraManagerReady:(STPCameraManager *)cameraManager;
+- (void)cameraManager:(STPCameraManager *)cameraManager didFailWithError:(NSError *)error;
+- (void)cameraManager:(STPCameraManager *)cameraManager didChangeCaptureDevicePosition:(AVCaptureDevicePosition)devicePosition;
+- (void)cameraManager:(STPCameraManager *)cameraManager didChangeFlashMode:(AVCaptureFlashMode)flashMode;
+- (void)cameraManager:(STPCameraManager *)cameraManager didOptimizeFocus:(BOOL)focus expose:(BOOL)expose; //FIXME
+
 
 @end

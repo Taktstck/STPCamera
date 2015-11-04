@@ -17,8 +17,10 @@
 @property (nonatomic, readwrite) CMMotionManager* motionManager;
 @property (nonatomic, readwrite) CLLocationManager *locationManager;
 
-@end
+@property (nonatomic) BOOL isReady;
+@property (nonatomic) BOOL isReadyLocationManager;
 
+@end
 
 static STPCameraManager  *sharedManager = nil;
 
@@ -38,25 +40,74 @@ static STPCameraManager  *sharedManager = nil;
 {
     self = [super init];
     if (self) {
+        _isReady = NO;
+        _isReadyLocationManager = NO;
         _processing = NO;
-        _isTraking = NO;
         _deviceOrientation = UIDeviceOrientationPortrait;
         _interfaceOrientation = UIInterfaceOrientationPortrait;
         _operationQueue = [NSOperationQueue new];
-        [self start];
     }
     return self;
 }
 
-- (void)start
+- (void)setupAVCaptureCompletionHandler:(void (^)(AVCaptureVideoPreviewLayer *previewLayer))handler
 {
+    if (self.delegate == nil) {
+        NSLog(@"require delegate. You have to set STPCameraManagerDelegate before call setupAVCapture");
+        abort();
+    }
+    
     [self startMotionManager];
     [self startLocationManager];
+    //[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] addObserver:self forKeyPath:@"adjustingExposure" options:NSKeyValueObservingOptionNew context:nil];
+    //[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] addObserver:self forKeyPath:@"adjustingFocus" options:NSKeyValueObservingOptionNew context:nil];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSError *error = nil;
+        self.captureSession = [AVCaptureSession new];
+        self.captureDeviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] error:&error];
+        self.captureStillImageOutput = [AVCaptureStillImageOutput new];
+    
+        if ([self.captureSession canAddInput:self.captureDeviceInput]) {
+            [self.captureSession addInput:self.captureDeviceInput];
+        }
+        
+        if ([self.captureSession canAddOutput:self.captureStillImageOutput]) {
+            [self.captureSession addOutput:self.captureStillImageOutput];
+        }
+        AVCaptureVideoPreviewLayer *previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.captureSession];
+        [self.captureSession startRunning];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self ready];
+            handler(previewLayer);
+        });
+    });
+}
+
+- (void)ready
+{
+    if (!self.isReady) {
+        if (self.isReadyLocationManager) {
+            [self.delegate cameraManagerReady:self];
+            self.isReady = YES;
+        }
+    }
 }
 
 - (void)terminate
 {
+    [self.captureSession stopRunning];
     sharedManager = nil;
+}
+
+- (void)dealloc
+{
+    [self.motionManager stopAccelerometerUpdates];
+    //[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] removeObserver:self forKeyPath:@"adjustingExposure"];
+    //[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] removeObserver:self forKeyPath:@"adjustingFocus"];
+    self.operationQueue = nil;
+    self.motionManager = nil;
 }
 
 #pragma mark - Element
@@ -66,7 +117,6 @@ static STPCameraManager  *sharedManager = nil;
     if (_motionManager) {
         return _motionManager;
     }
-    
     _motionManager = [CMMotionManager new];
     _motionManager.accelerometerUpdateInterval = 0.1;
     return _motionManager;
@@ -77,7 +127,6 @@ static STPCameraManager  *sharedManager = nil;
     if (_locationManager) {
         return _locationManager;
     }
-    _isTraking = NO;
     _locationManager = [CLLocationManager new];
     _locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
     _locationManager.distanceFilter = kCLDistanceFilterNone;
@@ -85,6 +134,343 @@ static STPCameraManager  *sharedManager = nil;
     return _locationManager;
 }
 
+#pragma mark - util
+
+- (AVCaptureConnection *)connectionWithMediaType:(NSString *)mediaType fromConnections:(NSArray *)connections {
+    AVCaptureConnection *videoConnection = nil;
+    for ( AVCaptureConnection *connection in connections ) {
+        for ( AVCaptureInputPort *port in [connection inputPorts] ) {
+            if ( [port.mediaType isEqual:mediaType] ) {
+                videoConnection = connection;
+                break;
+            }
+        }
+        if (videoConnection) {
+            break;
+        }
+    }
+    return videoConnection;
+}
+
+- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position
+{
+    __block AVCaptureDevice *__device = nil;
+    [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] enumerateObjectsUsingBlock:^( AVCaptureDevice *device, NSUInteger idx, BOOL *stop ) {
+        if ( [device position] == position ) {
+            __device = device;
+            *stop = YES;
+        }
+    }];
+    return __device;
+}
+
+- (AVCaptureDevice *)frontCamera
+{
+    return [self cameraWithPosition:AVCaptureDevicePositionFront];
+}
+
+- (AVCaptureDevice *)backCamera
+{
+    return [self cameraWithPosition:AVCaptureDevicePositionBack];
+}
+
+/*
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
+{
+    if ([keyPath isEqual:@"adjustingExposure"]) {
+        if ([[change objectForKey:NSKeyValueChangeNewKey] boolValue] == NO) {
+            NSLog(@"adjustingExposure end");
+        } else {
+            NSLog(@"adjustingExposure start");
+        }
+    }
+    
+    if ([keyPath isEqual:@"adjustingFocus"]) {
+        if ([[change objectForKey:NSKeyValueChangeNewKey] boolValue] == NO) {
+            NSLog(@"adjustingFocus end");
+        } else {
+            NSLog(@"adjustingFocus start");
+        }
+    }
+}
+*/
+#pragma mark - change capture device
+
+- (BOOL)hasMultipleCaptureDevices
+{
+    return [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count] > 1 ? YES : NO;
+}
+
+- (AVCaptureDevicePosition)devicePosition
+{
+    return self.captureDeviceInput.device.position;
+}
+
+- (void)setCaptureDevicePosition:(AVCaptureDevicePosition)devicePosition
+{
+    if ([self hasMultipleCaptureDevices]) {
+        NSError *error;
+        AVCaptureDeviceInput *deviceInput;
+        switch (devicePosition) {
+            case AVCaptureDevicePositionFront:
+                deviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontCamera] error:&error];
+                break;
+            case AVCaptureDevicePositionBack:
+                deviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backCamera] error:&error];
+                break;
+            case AVCaptureDevicePositionUnspecified:
+            default:
+                break;
+        }
+        if (deviceInput) {
+            [self.captureSession beginConfiguration];
+            [self.captureSession removeInput:self.captureDeviceInput];
+            
+            if ([self.captureSession canAddInput:deviceInput]) {
+                [self.captureSession addInput:deviceInput];
+                self.captureDeviceInput = deviceInput;
+            } else {
+                [self.captureSession addInput:self.captureDeviceInput];
+            }
+            [self.captureSession commitConfiguration];
+        } else {
+            if ([self.delegate respondsToSelector:@selector(cameraManager:didFailWithError:)]) {
+                [self.delegate cameraManager:self didFailWithError:error];
+            }
+        }
+    }
+}
+
+#pragma mark - change flash mode
+
+- (BOOL)hasFlash
+{
+    return self.captureDeviceInput.device.hasFlash;
+}
+
+- (AVCaptureFlashMode)flashMode
+{
+    return self.captureDeviceInput.device.flashMode;
+}
+
+- (void)setCaptureFlashMode:(AVCaptureFlashMode)flashMode
+{
+    AVCaptureDevice *device = self.captureDeviceInput.device;
+    if ([device isFlashModeSupported:flashMode] && device.flashMode != flashMode) {
+        NSError *error;
+        if ([device lockForConfiguration:&error]) {
+            device.flashMode = flashMode;
+            [device unlockForConfiguration];
+        } else {
+            if ([self.delegate respondsToSelector:@selector(cameraManager:didFailWithError:)]) {
+                [self.delegate cameraManager:self didFailWithError:error];
+            }
+        }
+    }
+}
+
+#pragma mark - control method
+
+- (void)captureImageWithCompletionHandler:(void (^)(UIImage *image, CLLocation *location, NSDictionary *metaData, NSError *error))handler
+{
+    if (self.isProcessing) {
+        return;
+    }
+    
+    self.processing = YES;
+    AVCaptureConnection *captureConnection = [self connectionWithMediaType:AVMediaTypeVideo fromConnections:self.captureStillImageOutput.connections];
+    
+    if ( [captureConnection isVideoOrientationSupported] ) {
+        switch (self.deviceOrientation) {
+            case UIDeviceOrientationPortraitUpsideDown:
+                [captureConnection setVideoOrientation:AVCaptureVideoOrientationPortraitUpsideDown];
+                break;
+                
+            case UIDeviceOrientationLandscapeLeft:
+                [captureConnection setVideoOrientation:AVCaptureVideoOrientationLandscapeRight];
+                break;
+                
+            case UIDeviceOrientationLandscapeRight:
+                [captureConnection setVideoOrientation:AVCaptureVideoOrientationLandscapeLeft];
+                break;
+                
+            default:
+                [captureConnection setVideoOrientation:AVCaptureVideoOrientationPortrait];
+                break;
+        }
+    }
+    
+    if (captureConnection) {
+        captureConnection.videoScaleAndCropFactor = 1;
+        
+        [self.captureStillImageOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+            if (imageDataSampleBuffer != NULL) {
+                NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+                UIImage *image = [[UIImage alloc] initWithData:data];
+                
+                CFDictionaryRef metadata = CMCopyDictionaryOfAttachments(NULL, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
+                NSMutableDictionary *meta = [[NSMutableDictionary alloc] initWithDictionary:(__bridge NSDictionary *)(metadata)];
+
+                CFRelease(metadata);
+                
+                if (self.locationManager) {
+                    meta[(NSString *)kCGImagePropertyGPSDictionary] = [self GPSDictionaryForLocation:self.locationManager.location];
+                }
+                
+                handler(image, self.locationManager.location, meta, error);
+            }
+            self.processing = NO;
+        }];
+    }
+}
+
+- (NSDictionary *)GPSDictionaryForLocation:(CLLocation *)location
+{
+    NSMutableDictionary *gps = [NSMutableDictionary new];
+    
+    // 日付
+    gps[(NSString *)kCGImagePropertyGPSDateStamp] = [[NSDateFormatter GPSDateFormatter] stringFromDate:location.timestamp];
+    // タイムスタンプ
+    gps[(NSString *)kCGImagePropertyGPSTimeStamp] = [[NSDateFormatter GPSTimeFormatter] stringFromDate:location.timestamp];
+    
+    
+    // 緯度
+    CGFloat latitude = location.coordinate.latitude;
+    NSString *gpsLatitudeRef;
+    if (latitude < 0) {
+        latitude = -latitude;
+        gpsLatitudeRef = @"S";
+    } else {
+        gpsLatitudeRef = @"N";
+    }
+    gps[(NSString *)kCGImagePropertyGPSLatitudeRef] = gpsLatitudeRef;
+    gps[(NSString *)kCGImagePropertyGPSLatitude] = @(latitude);
+    
+    // 経度
+    CGFloat longitude = location.coordinate.longitude;
+    NSString *gpsLongitudeRef;
+    if (longitude < 0) {
+        longitude = -longitude;
+        gpsLongitudeRef = @"W";
+    } else {
+        gpsLongitudeRef = @"E";
+    }
+    gps[(NSString *)kCGImagePropertyGPSLongitudeRef] = gpsLongitudeRef;
+    gps[(NSString *)kCGImagePropertyGPSLongitude] = @(longitude);
+    
+    // 標高
+    CGFloat altitude = location.altitude;
+    if (!isnan(altitude)){
+        NSString *gpsAltitudeRef;
+        if (altitude < 0) {
+            altitude = -altitude;
+            gpsAltitudeRef = @"1";
+        } else {
+            gpsAltitudeRef = @"0";
+        }
+        gps[(NSString *)kCGImagePropertyGPSAltitudeRef] = gpsAltitudeRef;
+        gps[(NSString *)kCGImagePropertyGPSAltitude] = @(altitude);
+    }
+    return gps;
+}
+
+
+
+#pragma mark - Focus & Exposure
+
+- (void)setOptimizeAtPoint:(CGPoint)point
+{
+    [self setFocusAtPoint:point];
+    [self setExposureAtPoint:point];
+}
+
+- (void)setFocusAtPoint:(CGPoint)point
+{
+    AVCaptureDevice *device = self.captureDeviceInput.device;
+    if (device.isFocusPointOfInterestSupported && [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+        NSError *error = nil;
+        if ([device lockForConfiguration:&error]) {
+            device.focusPointOfInterest = point;
+            device.focusMode = AVCaptureFocusModeAutoFocus;
+            [device unlockForConfiguration];
+        }
+    }
+}
+
+- (void)setExposureAtPoint:(CGPoint)point
+{
+    AVCaptureDevice *device = self.captureDeviceInput.device;
+    if (device.isExposurePointOfInterestSupported && [device isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
+        NSError *error = nil;
+        if ( [device lockForConfiguration:&error] ) {
+            device.exposurePointOfInterest = point;
+            device.exposureMode = AVCaptureExposureModeContinuousAutoExposure;
+            [device unlockForConfiguration];
+        }
+    }
+}
+
+- (CGPoint)convertToPointOfInterestFrom:(CGRect)frame coordinates:(CGPoint)viewCoordinates layer:(AVCaptureVideoPreviewLayer *)layer
+{
+    CGPoint pointOfInterest = (CGPoint){ 0.5f, 0.5f };
+    CGSize frameSize = frame.size;
+    
+    AVCaptureVideoPreviewLayer *videoPreviewLayer = layer;
+    
+    if ( [[videoPreviewLayer videoGravity] isEqualToString:AVLayerVideoGravityResize] )
+        pointOfInterest = (CGPoint){ viewCoordinates.y / frameSize.height, 1.0f - (viewCoordinates.x / frameSize.width) };
+    else {
+        CGRect cleanAperture;
+        for (AVCaptureInputPort *port in self.captureDeviceInput.ports) {
+            if ([port mediaType] == AVMediaTypeVideo) {
+                cleanAperture = CMVideoFormatDescriptionGetCleanAperture([port formatDescription], YES);
+                CGSize apertureSize = cleanAperture.size;
+                CGPoint point = viewCoordinates;
+                
+                CGFloat apertureRatio = apertureSize.height / apertureSize.width;
+                CGFloat viewRatio = frameSize.width / frameSize.height;
+                CGFloat xc = 0.5f;
+                CGFloat yc = 0.5f;
+                
+                if ( [[videoPreviewLayer videoGravity] isEqualToString:AVLayerVideoGravityResizeAspect] ) {
+                    if (viewRatio > apertureRatio) {
+                        CGFloat y2 = frameSize.height;
+                        CGFloat x2 = frameSize.height * apertureRatio;
+                        CGFloat x1 = frameSize.width;
+                        CGFloat blackBar = (x1 - x2) / 2;
+                        if (point.x >= blackBar && point.x <= blackBar + x2) {
+                            xc = point.y / y2;
+                            yc = 1.0f - ((point.x - blackBar) / x2);
+                        }
+                    } else {
+                        CGFloat y2 = frameSize.width / apertureRatio;
+                        CGFloat y1 = frameSize.height;
+                        CGFloat x2 = frameSize.width;
+                        CGFloat blackBar = (y1 - y2) / 2;
+                        if (point.y >= blackBar && point.y <= blackBar + y2) {
+                            xc = ((point.y - blackBar) / y2);
+                            yc = 1.0f - (point.x / x2);
+                        }
+                    }
+                } else if ([[videoPreviewLayer videoGravity] isEqualToString:AVLayerVideoGravityResizeAspectFill]) {
+                    if (viewRatio > apertureRatio) {
+                        CGFloat y2 = apertureSize.width * (frameSize.width / apertureSize.height);
+                        xc = (point.y + ((y2 - frameSize.height) / 2.0f)) / y2;
+                        yc = (frameSize.width - point.x) / frameSize.width;
+                    } else {
+                        CGFloat x2 = apertureSize.height * (frameSize.height / apertureSize.width);
+                        yc = 1.0f - ((point.x + ((x2 - frameSize.width) / 2)) / x2);
+                        xc = point.y / frameSize.height;
+                    }
+                }
+                
+                pointOfInterest = (CGPoint){ xc, yc };
+                break;
+            }
+        }
+    }
+    return pointOfInterest;
+}
 
 #pragma mark - Location manager
 
@@ -104,14 +490,10 @@ static STPCameraManager  *sharedManager = nil;
     }
 }
 
-- (void)locationManager:(nonnull CLLocationManager *)manager didUpdateLocations:(nonnull NSArray<CLLocation *> *)locations
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
-    if (!self.isTraking) {
-        _isTraking = YES;
-        if ([self.delegate respondsToSelector:@selector(cameraManager:readyForLocationManager:)]) {
-            [self.delegate cameraManager:self readyForLocationManager:self.locationManager];
-        }
-    }
+    self.isReadyLocationManager = YES;
+    [self ready];
 }
 
 #pragma mark - Motion manager
@@ -198,337 +580,6 @@ static STPCameraManager  *sharedManager = nil;
          */
         
     }];
-}
-
-#pragma mark - util
-
-- (AVCaptureConnection *)connectionWithMediaType:(NSString *)mediaType fromConnections:(NSArray *)connections {
-    AVCaptureConnection *videoConnection = nil;
-    for ( AVCaptureConnection *connection in connections ) {
-        for ( AVCaptureInputPort *port in [connection inputPorts] ) {
-            if ( [port.mediaType isEqual:mediaType] ) {
-                videoConnection = connection;
-                break;
-            }
-        }
-        if (videoConnection) {
-            break;
-        }
-    }
-    
-    return videoConnection;
-}
-
-#pragma mark - change camera
-
-- (BOOL)hasMultipleCameras
-{
-    return [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count] > 1 ? YES : NO;
-}
-
-- (void)changeCamara
-{
-    if ([self hasMultipleCameras]) {
-        NSError *error;
-        AVCaptureDeviceInput *deviceInput;
-        AVCaptureDevicePosition position = self.deviceInput.device.position;
-        
-        switch (position) {
-            case AVCaptureDevicePositionBack:
-                deviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontCamera] error:&error];
-                break;
-            case AVCaptureDevicePositionFront:
-                deviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backCamera] error:&error];
-                break;
-            case AVCaptureDevicePositionUnspecified:
-            default:
-                
-                break;
-        }
-        
-        if (deviceInput) {
-            [self.captureSession beginConfiguration];
-            [self.captureSession removeInput:self.deviceInput];
-            
-            if ([self.captureSession canAddInput:deviceInput]) {
-                [self.captureSession addInput:deviceInput];
-                _deviceInput = deviceInput;
-            } else {
-                [self.captureSession addInput:self.deviceInput];
-            }
-            [self.captureSession commitConfiguration];
-        } else {
-            if ([self.delegate respondsToSelector:@selector(cameraManager:error:)]) {
-                [self.delegate cameraManager:self error:error];
-            }
-        }
-    }
-}
-
-
-#pragma mark - flash mode
-
-- (BOOL)hasFlash
-{
-    return _deviceInput.device.hasFlash;
-}
-
-- (AVCaptureFlashMode)flashMode
-{
-    return _deviceInput.device.flashMode;
-}
-
-- (void)setFlashMode:(AVCaptureFlashMode)flashMode
-{
-    AVCaptureDevice *device = _deviceInput.device;
-    if ([device isFlashModeSupported:flashMode] && device.flashMode != flashMode) {
-        NSError *error;
-        if ([device lockForConfiguration:&error]) {
-            device.flashMode = flashMode;
-            [device unlockForConfiguration];
-        } else {
-            if ([self.delegate respondsToSelector:@selector(cameraManager:error:)]) {
-                [self.delegate cameraManager:self error:error];
-            }
-        }
-    }
-}
-
-#pragma mark - control method
-
-- (void)captureImageWithCompletionHandler:(void (^)(UIImage *image, CLLocation *location, NSDictionary *metaData, NSError *error))handler
-{
-    if (self.isProcessing) {
-        return;
-    }
-    
-    self.processing = YES;
-    AVCaptureConnection *captureConnection = [self connectionWithMediaType:AVMediaTypeVideo fromConnections:self.stillImageOut.connections];
-    
-    if ( [captureConnection isVideoOrientationSupported] ) {
-        switch (self.deviceOrientation) {
-            case UIDeviceOrientationPortraitUpsideDown:
-                [captureConnection setVideoOrientation:AVCaptureVideoOrientationPortraitUpsideDown];
-                break;
-                
-            case UIDeviceOrientationLandscapeLeft:
-                [captureConnection setVideoOrientation:AVCaptureVideoOrientationLandscapeRight];
-                break;
-                
-            case UIDeviceOrientationLandscapeRight:
-                [captureConnection setVideoOrientation:AVCaptureVideoOrientationLandscapeLeft];
-                break;
-                
-            default:
-                [captureConnection setVideoOrientation:AVCaptureVideoOrientationPortrait];
-                break;
-        }
-    }
-    
-    if (captureConnection) {
-        captureConnection.videoScaleAndCropFactor = 1;
-        
-        [self.stillImageOut captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-            if (imageDataSampleBuffer != NULL) {
-                NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-                UIImage *image = [[UIImage alloc] initWithData:data];
-                
-                CFDictionaryRef metadata = CMCopyDictionaryOfAttachments(NULL, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
-                NSMutableDictionary *meta = [[NSMutableDictionary alloc] initWithDictionary:(__bridge NSDictionary *)(metadata)];
-
-                CFRelease(metadata);
-                
-                if (self.isTraking && self.locationManager) {
-                    meta[(NSString *)kCGImagePropertyGPSDictionary] = [self GPSDictionaryForLocation:self.locationManager.location];
-                }
-                
-                handler(image, self.locationManager.location, meta, error);
-            }
-            self.processing = NO;
-        }];
-    }
-}
-
-- (NSDictionary *)GPSDictionaryForLocation:(CLLocation *)location
-{
-    NSMutableDictionary *gps = [NSMutableDictionary new];
-    
-    // 日付
-    gps[(NSString *)kCGImagePropertyGPSDateStamp] = [[NSDateFormatter GPSDateFormatter] stringFromDate:location.timestamp];
-    // タイムスタンプ
-    gps[(NSString *)kCGImagePropertyGPSTimeStamp] = [[NSDateFormatter GPSTimeFormatter] stringFromDate:location.timestamp];
-    
-    
-    // 緯度
-    CGFloat latitude = location.coordinate.latitude;
-    NSString *gpsLatitudeRef;
-    if (latitude < 0) {
-        latitude = -latitude;
-        gpsLatitudeRef = @"S";
-    } else {
-        gpsLatitudeRef = @"N";
-    }
-    gps[(NSString *)kCGImagePropertyGPSLatitudeRef] = gpsLatitudeRef;
-    gps[(NSString *)kCGImagePropertyGPSLatitude] = @(latitude);
-    
-    // 経度
-    CGFloat longitude = location.coordinate.longitude;
-    NSString *gpsLongitudeRef;
-    if (longitude < 0) {
-        longitude = -longitude;
-        gpsLongitudeRef = @"W";
-    } else {
-        gpsLongitudeRef = @"E";
-    }
-    gps[(NSString *)kCGImagePropertyGPSLongitudeRef] = gpsLongitudeRef;
-    gps[(NSString *)kCGImagePropertyGPSLongitude] = @(longitude);
-    
-    // 標高
-    CGFloat altitude = location.altitude;
-    if (!isnan(altitude)){
-        NSString *gpsAltitudeRef;
-        if (altitude < 0) {
-            altitude = -altitude;
-            gpsAltitudeRef = @"1";
-        } else {
-            gpsAltitudeRef = @"0";
-        }
-        gps[(NSString *)kCGImagePropertyGPSAltitudeRef] = gpsAltitudeRef;
-        gps[(NSString *)kCGImagePropertyGPSAltitude] = @(altitude);
-    }
-    
-    return gps;
-}
-
-
-
-#pragma mark - Focus & Exposure
-
-- (void)optimizeAtPoint:(CGPoint)point
-{
-    [self focusAtPoint:point];
-    [self exposureAtPoint:point];
-}
-
-- (void)focusAtPoint:(CGPoint)point
-{
-    AVCaptureDevice *device = self.deviceInput.device;
-    if (device.isFocusPointOfInterestSupported && [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
-        NSError *error = nil;
-        if ([device lockForConfiguration:&error]) {
-            device.focusPointOfInterest = point;
-            device.focusMode = AVCaptureFocusModeAutoFocus;
-            [device unlockForConfiguration];
-        }
-    }
-}
-
-- (void)exposureAtPoint:(CGPoint)point
-{
-    AVCaptureDevice *device = self.deviceInput.device;
-    if (device.isExposurePointOfInterestSupported && [device isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
-        NSError *error = nil;
-        if ( [device lockForConfiguration:&error] ) {
-            device.exposurePointOfInterest = point;
-            device.exposureMode = AVCaptureExposureModeContinuousAutoExposure;
-            [device unlockForConfiguration];
-        }
-    }
-}
-
-- (CGPoint)convertToPointOfInterestFrom:(CGRect)frame coordinates:(CGPoint)viewCoordinates layer:(AVCaptureVideoPreviewLayer *)layer
-{
-    CGPoint pointOfInterest = (CGPoint){ 0.5f, 0.5f };
-    CGSize frameSize = frame.size;
-    
-    AVCaptureVideoPreviewLayer *videoPreviewLayer = layer;
-    
-    if ( [[videoPreviewLayer videoGravity] isEqualToString:AVLayerVideoGravityResize] )
-        pointOfInterest = (CGPoint){ viewCoordinates.y / frameSize.height, 1.0f - (viewCoordinates.x / frameSize.width) };
-    else {
-        CGRect cleanAperture;
-        for (AVCaptureInputPort *port in self.deviceInput.ports) {
-            if ([port mediaType] == AVMediaTypeVideo) {
-                cleanAperture = CMVideoFormatDescriptionGetCleanAperture([port formatDescription], YES);
-                CGSize apertureSize = cleanAperture.size;
-                CGPoint point = viewCoordinates;
-                
-                CGFloat apertureRatio = apertureSize.height / apertureSize.width;
-                CGFloat viewRatio = frameSize.width / frameSize.height;
-                CGFloat xc = 0.5f;
-                CGFloat yc = 0.5f;
-                
-                if ( [[videoPreviewLayer videoGravity] isEqualToString:AVLayerVideoGravityResizeAspect] ) {
-                    if (viewRatio > apertureRatio) {
-                        CGFloat y2 = frameSize.height;
-                        CGFloat x2 = frameSize.height * apertureRatio;
-                        CGFloat x1 = frameSize.width;
-                        CGFloat blackBar = (x1 - x2) / 2;
-                        if (point.x >= blackBar && point.x <= blackBar + x2) {
-                            xc = point.y / y2;
-                            yc = 1.0f - ((point.x - blackBar) / x2);
-                        }
-                    } else {
-                        CGFloat y2 = frameSize.width / apertureRatio;
-                        CGFloat y1 = frameSize.height;
-                        CGFloat x2 = frameSize.width;
-                        CGFloat blackBar = (y1 - y2) / 2;
-                        if (point.y >= blackBar && point.y <= blackBar + y2) {
-                            xc = ((point.y - blackBar) / y2);
-                            yc = 1.0f - (point.x / x2);
-                        }
-                    }
-                } else if ([[videoPreviewLayer videoGravity] isEqualToString:AVLayerVideoGravityResizeAspectFill]) {
-                    if (viewRatio > apertureRatio) {
-                        CGFloat y2 = apertureSize.width * (frameSize.width / apertureSize.height);
-                        xc = (point.y + ((y2 - frameSize.height) / 2.0f)) / y2;
-                        yc = (frameSize.width - point.x) / frameSize.width;
-                    } else {
-                        CGFloat x2 = apertureSize.height * (frameSize.height / apertureSize.width);
-                        yc = 1.0f - ((point.x + ((x2 - frameSize.width) / 2)) / x2);
-                        xc = point.y / frameSize.height;
-                    }
-                }
-                
-                pointOfInterest = (CGPoint){ xc, yc };
-                break;
-            }
-        }
-    }
-    
-    return pointOfInterest;
-}
-
-- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position
-{
-    __block AVCaptureDevice *__device = nil;
-    
-    [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] enumerateObjectsUsingBlock:^( AVCaptureDevice *device, NSUInteger idx, BOOL *stop ) {
-        if ( [device position] == position ) {
-            __device = device;
-            *stop = YES;
-        }
-    }];
-    
-    return __device;
-}
-
-- (AVCaptureDevice *)frontCamera
-{
-    return [self cameraWithPosition:AVCaptureDevicePositionFront];
-}
-
-- (AVCaptureDevice *)backCamera
-{
-    return [self cameraWithPosition:AVCaptureDevicePositionBack];
-}
-
-
-- (void)dealloc
-{
-    [self.motionManager stopAccelerometerUpdates];
-    self.operationQueue = nil;
-    self.motionManager = nil;
 }
 
 @end

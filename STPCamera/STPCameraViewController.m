@@ -82,6 +82,7 @@
 
 - (void)setupAVCapture
 {
+    /*
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         
         NSError *error = nil;
@@ -105,13 +106,22 @@
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [STPCameraManager sharedManager].captureSession = session;
-            [STPCameraManager sharedManager].deviceInput = cameraInput;
-            [STPCameraManager sharedManager].stillImageOut = stillImageOut;
+            [STPCameraManager sharedManager].captureDeviceInput = cameraInput;
+            [STPCameraManager sharedManager].captureStillImageOutput = stillImageOut;
             [STPCameraManager sharedManager].delegate = self;
             self.view.layer.masksToBounds = YES;
             [self.view.layer insertSublayer:_captureVideoPreviewLayer atIndex:0];
         });
-    });
+    });*/
+    
+    [[STPCameraManager sharedManager] setDelegate:self];
+    [[STPCameraManager sharedManager] setupAVCaptureCompletionHandler:^(AVCaptureVideoPreviewLayer *previewLayer) {
+        _captureVideoPreviewLayer = previewLayer;
+        _captureVideoPreviewLayer.frame = self.view.bounds;
+        _captureVideoPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+        self.view.layer.masksToBounds = YES;
+        [self.view.layer insertSublayer:_captureVideoPreviewLayer atIndex:0];
+    }];
 }
 
 - (void)viewDidLoad
@@ -119,16 +129,11 @@
     [super viewDidLoad];
     [self setupAVCapture];
     
-    [self addChildViewController:self.previewController];
-    [self.view addSubview:self.previewController.view];
-    [self.previewController didMoveToParentViewController:self];
+    //[self addChildViewController:self.previewController];
+    //[self.view addSubview:self.previewController.view];
+    //[self.previewController didMoveToParentViewController:self];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    [self.cameraView drawAtPoint:self.view.center remove:YES];
-}
 
 #pragma mark - Elements
 
@@ -152,54 +157,73 @@
     return _previewController;
 }
 
-#pragma mark - Camera view delegate
+#pragma mark - STPCameraViewDelegate
 
-- (void)changeCamera
+- (AVCaptureFlashMode)captureFlashMode
 {
-    [[STPCameraManager sharedManager] changeCamara];
+    return [STPCameraManager sharedManager].flashMode;
 }
 
-- (void)flashMode:(AVCaptureFlashMode)flashMode
+- (AVCaptureDevicePosition)captureDevicePosition
 {
-    [[STPCameraManager sharedManager] setFlashMode:flashMode];
+    return [STPCameraManager sharedManager].devicePosition;
+}
+
+- (void)cameraView:(STPCameraView *)cameraView changeCaptureDevicePosition:(AVCaptureDevicePosition)captureDevicePosition
+{
+    [[STPCameraManager sharedManager] setCaptureDevicePosition:captureDevicePosition];
+}
+
+- (void)cameraView:(STPCameraView *)cameraView changeCaptureFlashMode:(AVCaptureFlashMode)flashMode
+{
+    [[STPCameraManager sharedManager] setCaptureFlashMode:flashMode];
 }
 
 - (void)cameraView:(STPCameraView *)cameraView optimizeAtPoint:(CGPoint)point
 {
     CGPoint convertPoint = [[STPCameraManager sharedManager] convertToPointOfInterestFrom:self.captureVideoPreviewLayer.frame coordinates:point layer:self.captureVideoPreviewLayer];
-    [[STPCameraManager sharedManager] optimizeAtPoint:convertPoint];
+    [[STPCameraManager sharedManager] setOptimizeAtPoint:convertPoint];
 }
 
-- (void)cancel
+- (void)cameraViewStartRecording:(STPCameraMode)cameraMode
 {
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
+    if (cameraMode != STPCameraModeShot) {
+        return;
+    }
 
-- (void)cameraViewStartRecording
-{
 #if TARGET_IPHONE_SIMULATOR
     
-    CGFloat r = (random() % 100 + 10)/100.0f;
-    CGFloat g = (random() % 100 + 10)/100.0f;
-    CGFloat b = (random() % 100 + 10)/100.0f;
-    UIImage *image;
-    UIGraphicsBeginImageContext(self.view.bounds.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetRGBFillColor(context, r, g, b, 1.0);
-    CGContextAddRect(context,self.view.bounds);
-    CGContextFillPath(context);
-    
-    image = UIGraphicsGetImageFromCurrentImageContext();
+
+    CGRect rect = self.view.bounds;
+    UIGraphicsBeginImageContextWithOptions(rect.size, NO, 1.0f);
+    [[UIColor colorWithHue:(float)(rand() % 100) / 100 saturation:1.0 brightness:1.0 alpha:1.0] setFill];
+    UIRectFillUsingBlendMode(rect, kCGBlendModeNormal);
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
-    /*
-     CGRect rect = rand() % 2 == 0 ? CGRectMake(0, 0, 400, 300) : CGRectMake(0, 0, 300, 400);
-     UIGraphicsBeginImageContextWithOptions(rect.size, NO, 1.0f);
-     [[UIColor colorWithHue:(float)(rand() % 100) / 100 saturation:1.0 brightness:1.0 alpha:1.0] setFill];
-     UIRectFillUsingBlendMode(rect, kCGBlendModeNormal);
-     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-     UIGraphicsEndImageContext();
-     */
+    if (image) {
+        __block NSString *localIdentifier;
+        [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+            // Create PHAsset from UIImage
+            PHAssetChangeRequest *assetChangeRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
+            
+            PHObjectPlaceholder *assetPlaceholder = assetChangeRequest.placeholderForCreatedAsset;
+            localIdentifier = assetPlaceholder.localIdentifier;
+            
+            // Add PHAsset to PHAssetCollection
+            /*
+             PHAssetCollectionChangeRequest *assetCollectionChangeRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:self.previewController.assetCollection];
+             [assetCollectionChangeRequest addAssets:@[assetPlaceholder]];
+             */
+        } completionHandler:^(BOOL success, NSError *error) {
+            if (!success) {
+                NSLog(@"creating Asset Error: %@", error);
+            } else {
+            
+            }
+        }];
+        
+    }
     
 #else
     
@@ -235,7 +259,6 @@
                             [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
                                 PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
                                 [request setLocation:location];
-                                //[request setCreationDate:[NSDate date]];
                             } completionHandler:^(BOOL success, NSError *error) {
                                 if (success) {
                                     NSLog(@"%s add location data success", __PRETTY_FUNCTION__);
@@ -253,18 +276,33 @@
 #endif
 }
 
-- (void)cameraManager:(STPCameraManager *)manager error:(NSError *)error
+#pragma cameraManagerDelegate
+
+- (void)cameraManagerReady:(STPCameraManager *)cameraManager
 {
-    NSLog(@"%@", error);
+    [self.cameraView drawAtPoint:self.view.center remove:YES];
 }
 
-
-#pragma mark - CameraManager
-
-- (void)cameraManager:(STPCameraManager *)manager readyForLocationManager:(CLLocationManager *)locationManager
+- (void)cameraManager:(STPCameraManager *)cameraMnager didChangeCaptureDevicePosition:(AVCaptureDevicePosition)devicePosition
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    
 }
+
+- (void)cameraManager:(STPCameraManager *)cameraMnager didChangeFlashMode:(AVCaptureFlashMode)flashMode
+{
+    
+}
+
+- (void)cameraManager:(STPCameraManager *)cameraManager didOptimizeFocus:(BOOL)focus expose:(BOOL)expose
+{
+    
+}
+
+- (void)cameraManager:(STPCameraManager *)cameraManager didFailWithError:(NSError *)error
+{
+    
+}
+
 
 #pragma mark - memory
 
