@@ -624,19 +624,6 @@ static CGFloat kbottomToolbarHeight = 80;
     }
     [CATransaction commit];
 }
-/*
-- (void)drawRect:(CGRect)rect
-{
-    [super drawRect:rect];
-    
-    [self.faceBoxes enumerateObjectsUsingBlock:^(UIBezierPath * _Nonnull path, NSUInteger idx, BOOL * _Nonnull stop) {
-        [[UIColor colorWithRed:1 green:1 blue:0.5 alpha:1] setStroke];
-        path.lineWidth = 2.0f;
-        [path stroke];
-    }];
-    
-}
-*/
 
 #pragma mark - util
 
