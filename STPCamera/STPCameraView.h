@@ -8,6 +8,8 @@
 
 @import UIKit;
 @import AVFoundation;
+@import CoreImage;
+@import CoreVideo;
 
 #import <pop/POP.h>
 #import <pop/POPLayerExtras.h>
@@ -29,7 +31,8 @@ typedef NS_ENUM(NSInteger, STPCameraMode) {
 @property (nonatomic, readonly) UIView *bottomToolbar;
 @property (nonatomic) id <STPCameraViewDelegate> delegate;
 
-- (void)drawAtPoint:(CGPoint)point remove:(BOOL)remove;
+- (void)drawOptimizeCircleAtPoint:(CGPoint)point remove:(BOOL)remove;
+- (void)drawFaceBoxesForFeatures:(NSArray <CIFaceFeature *>*)features aperture:(CGRect)aperture onPreviewLayer:(AVCaptureVideoPreviewLayer *)previewLayer;
 
 @end
 

@@ -28,6 +28,22 @@
 
 @end
 
+@implementation NSArray (Sublayer)
+
+- (CALayer *)layerForName:(NSString *)name
+{
+    __block CALayer *layer = nil;
+    [self enumerateObjectsUsingBlock:^(CALayer * _Nonnull aLayer, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([aLayer.name isEqualToString:name]) {
+            layer = aLayer;
+            *stop = YES;
+        }
+    }];
+    return layer;
+}
+
+@end
+
 @interface STPCameraView ()
 
 @property (nonatomic) UIEdgeInsets insets;
@@ -39,6 +55,8 @@
 @property (nonatomic) CALayer *triggerButtonOutline;
 @property (nonatomic) CALayer *focusBox;
 @property (nonatomic) CALayer *exposeBox;
+@property (nonatomic) CALayer *faceLayer;
+@property (nonatomic) NSArray <UIBezierPath *>*faceBoxes;
 
 // top toolbar
 @property (nonatomic, readwrite) STPCameraViewToolbar *topToolbar;
@@ -102,10 +120,13 @@ static CGFloat kbottomToolbarHeight = 80;
 
 - (void)commonInit
 {
+    self.backgroundColor = [UIColor clearColor];
+    self.tintColor = [UIColor whiteColor];
+    
     _insets = UIEdgeInsetsMake(16, 16, 16, 16);
     _triggerButtonCenter = CGPointMake(self.bounds.size.width/2, self.bounds.size.height - triggerButtonOutlineRadius * 2);
-    self.tintColor = [UIColor whiteColor];
     _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGesture:)];
+    
     [self addGestureRecognizer:_tapGestureRecognizer];
 }
 
@@ -114,6 +135,7 @@ static CGFloat kbottomToolbarHeight = 80;
     [super didMoveToSuperview];
     [self.layer addSublayer:self.focusBox];
     [self.layer addSublayer:self.exposeBox];
+    [self.layer addSublayer:self.faceLayer];
     [self addSubview:self.shutterView];
     [self addSubview:self.contentView];
     
@@ -127,6 +149,7 @@ static CGFloat kbottomToolbarHeight = 80;
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    self.faceLayer.frame = self.bounds;
     self.triggerButton.center = CGPointMake(self.bottomToolbar.bounds.size.width/2, self.bottomToolbar.bounds.size.height/2);
     self.triggerButtonOutline.position = self.triggerButton.center;
 }
@@ -319,6 +342,17 @@ static CGFloat kbottomToolbarHeight = 80;
     return _exposeBox;
 }
 
+- (CALayer *)faceLayer
+{
+    if (_faceLayer) {
+        return _faceLayer;
+    }
+    _faceLayer = [CALayer layer];
+    [_faceLayer setBounds:self.bounds];
+    [_faceLayer setBackgroundColor:[UIColor clearColor].CGColor];
+    return _faceLayer;
+}
+
 #pragma mark - trigger
 
 - (UIView *)triggerButton
@@ -418,12 +452,12 @@ static CGFloat kbottomToolbarHeight = 80;
     if ([self.delegate respondsToSelector:@selector(cameraViewShouldBeginOptimize:)]) {
         if ([self.delegate cameraViewShouldBeginOptimize:self]) {
             CGPoint point = [recognizer locationInView:self];
-            [self drawAtPoint:point remove:YES];
+            [self drawOptimizeCircleAtPoint:point remove:YES];
             [self.delegate cameraView:self optimizeAtPoint:point];
         }
     } else {
         CGPoint point = [recognizer locationInView:self];
-        [self drawAtPoint:point remove:YES];
+        [self drawOptimizeCircleAtPoint:point remove:YES];
         [self.delegate cameraView:self optimizeAtPoint:point];
     }
 }
@@ -489,9 +523,9 @@ static CGFloat kbottomToolbarHeight = 80;
     [self.delegate cameraView:self changeCaptureFlashMode:captureFlashMode];
 }
 
-#pragma mark -
+#pragma mark - optimize circle
 
-- (void)drawAtPoint:(CGPoint)point remove:(BOOL)remove
+- (void)drawOptimizeCircleAtPoint:(CGPoint)point remove:(BOOL)remove
 {
     [CATransaction begin];
     [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
@@ -529,7 +563,117 @@ static CGFloat kbottomToolbarHeight = 80;
     animation.fromValue = @(0);
     animation.toValue = @(1);
     [self pop_addAnimation:animation forKey:@"inc.stamp.stp.camera.optimize"];
+}
+
+- (void)drawFaceBoxesForFeatures:(NSArray <CIFaceFeature *>*)features aperture:(CGRect)aperture onPreviewLayer:(AVCaptureVideoPreviewLayer *)previewLayer
+{
+    NSArray *subLayers = self.faceLayer.sublayers;
     
+    //描画領域の取得
+    CGSize parentFrameSize = [self bounds].size;
+    NSString *gravity = [previewLayer videoGravity];
+    CGRect previewBox = [self videoPreviewBoxForGravity:gravity
+                                              frameSize:parentFrameSize
+                                           apertureSize:aperture.size];
+    
+    //表示サイズとの比率
+    CGFloat widthScaleBy = previewBox.size.width / aperture.size.height;
+    CGFloat heightScaleBy = previewBox.size.height / aperture.size.width;
+    
+    [CATransaction begin];
+    //[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+    
+    NSMutableArray *trackingLayer = @[].mutableCopy;
+
+    [features enumerateObjectsUsingBlock:^(CIFaceFeature * _Nonnull faceFeature, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (faceFeature.hasTrackingID) {
+            [CATransaction begin];
+            [CATransaction setAnimationDuration:0.1f];
+            NSString *name = [@(faceFeature.trackingID) stringValue];
+            CAShapeLayer *layer = (CAShapeLayer *)[subLayers layerForName:name];
+            if (!layer) {
+                layer = [CAShapeLayer layer];
+                layer.name = name;
+                layer.lineWidth = 2.0f;
+                layer.strokeColor = [UIColor colorWithRed:1 green:1 blue:0.5 alpha:1].CGColor;
+                layer.fillColor = [UIColor clearColor].CGColor;
+                [self.faceLayer addSublayer:layer];
+            }
+            CGRect faceRect = [faceFeature bounds];
+            CGFloat temp = faceRect.size.width;
+            faceRect.size.width = faceRect.size.height;
+            faceRect.size.height = temp;
+            temp = faceRect.origin.x;
+            faceRect.origin.x = faceRect.origin.y;
+            faceRect.origin.y = temp;
+            faceRect.size.width *= widthScaleBy;
+            faceRect.size.height *= heightScaleBy;
+            faceRect.origin.x *= widthScaleBy;
+            faceRect.origin.y *= heightScaleBy;
+            UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:faceRect cornerRadius:8];
+            layer.path = path.CGPath;
+            [trackingLayer addObject:layer];
+            [CATransaction commit];
+        }
+    }];
+
+    for (CALayer *layer in [self.faceLayer.sublayers reverseObjectEnumerator]) {
+        if (![trackingLayer containsObject:layer]) {
+            [layer removeFromSuperlayer];
+        }
+    }
+    [CATransaction commit];
+}
+/*
+- (void)drawRect:(CGRect)rect
+{
+    [super drawRect:rect];
+    
+    [self.faceBoxes enumerateObjectsUsingBlock:^(UIBezierPath * _Nonnull path, NSUInteger idx, BOOL * _Nonnull stop) {
+        [[UIColor colorWithRed:1 green:1 blue:0.5 alpha:1] setStroke];
+        path.lineWidth = 2.0f;
+        [path stroke];
+    }];
+    
+}
+*/
+
+#pragma mark - util
+
+- (CGRect)videoPreviewBoxForGravity:(NSString *)gravity frameSize:(CGSize)frameSize apertureSize:(CGSize)apertureSize
+{
+
+    CGFloat apertureRatio = apertureSize.height / apertureSize.width;
+    CGFloat viewRatio = frameSize.width / frameSize.height;
+    
+    CGSize size = CGSizeZero;
+    if([gravity isEqualToString:AVLayerVideoGravityResizeAspect]) {
+        if(viewRatio > apertureRatio){
+            size.width = apertureSize.height * (frameSize.height / apertureSize.width);
+            size.height = frameSize.height;
+        }else{
+            size.width = frameSize.width;
+            size.height = apertureSize.width * (frameSize.width / apertureSize.height);
+        }
+    } else if ([gravity isEqualToString:AVLayerVideoGravityResizeAspectFill]) {
+        size = frameSize;
+    }
+        
+    CGRect videoBox;
+    videoBox.size = size;
+    if(size.width < frameSize.width){
+        videoBox.origin.x = (frameSize.width - size.width) / 2;
+    }else{
+        videoBox.origin.x = (size.width - frameSize.width) / 2;
+    }
+    
+    if(size.height < frameSize.height){
+        videoBox.origin.y = (frameSize.height - size.height) / 2;
+    }else{
+        videoBox.origin.y = (size.height - frameSize.height) / 2;
+    }
+    
+    return videoBox;
 }
 
 @end

@@ -11,6 +11,11 @@
 
 @interface STPCameraManager ()
 
+@property (nonatomic, readwrite) AVCaptureSession *captureSession;
+@property (nonatomic, readwrite) AVCaptureDeviceInput *captureDeviceInput;
+@property (nonatomic, readwrite) AVCaptureStillImageOutput *captureStillImageOutput;
+@property (nonatomic, readwrite) AVCaptureVideoDataOutput *captureVideoDataOutput;
+
 @property (nonatomic, getter=isProcessing) BOOL processing;
 @property (nonatomic) NSOperationQueue* operationQueue;
 
@@ -25,6 +30,10 @@
 static STPCameraManager  *sharedManager = nil;
 
 @implementation STPCameraManager
+{
+    dispatch_queue_t videoDataOutputQueue;
+    CIDetector *_faceDetector;
+}
 
 + (instancetype)sharedManager
 {
@@ -43,6 +52,10 @@ static STPCameraManager  *sharedManager = nil;
         _isReady = NO;
         _isReadyLocationManager = NO;
         _processing = NO;
+        _faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace
+                                           context:nil
+                                           options:@{CIDetectorAccuracy: CIDetectorAccuracyLow,
+                                                     CIDetectorTracking: @YES}];
         _deviceOrientation = UIDeviceOrientationPortrait;
         _interfaceOrientation = UIInterfaceOrientationPortrait;
         _operationQueue = [NSOperationQueue new];
@@ -62,19 +75,32 @@ static STPCameraManager  *sharedManager = nil;
     //[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] addObserver:self forKeyPath:@"adjustingExposure" options:NSKeyValueObservingOptionNew context:nil];
     //[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] addObserver:self forKeyPath:@"adjustingFocus" options:NSKeyValueObservingOptionNew context:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSError *error = nil;
         self.captureSession = [AVCaptureSession new];
         self.captureDeviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] error:&error];
-        self.captureStillImageOutput = [AVCaptureStillImageOutput new];
-    
         if ([self.captureSession canAddInput:self.captureDeviceInput]) {
             [self.captureSession addInput:self.captureDeviceInput];
         }
         
+        self.captureStillImageOutput = [AVCaptureStillImageOutput new];
         if ([self.captureSession canAddOutput:self.captureStillImageOutput]) {
             [self.captureSession addOutput:self.captureStillImageOutput];
         }
+        
+        self.captureVideoDataOutput = [AVCaptureVideoDataOutput new];
+        [self.captureVideoDataOutput setVideoSettings: @{(id)kCVPixelBufferPixelFormatTypeKey:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA]}];
+        videoDataOutputQueue = dispatch_queue_create("inc.stamp.stp.VideoDataOutputQueue", DISPATCH_QUEUE_SERIAL);
+        [self.captureVideoDataOutput setSampleBufferDelegate:self queue:videoDataOutputQueue];
+        
+        if ([self.captureSession canAddOutput:self.captureVideoDataOutput]) {
+            [self.captureSession addOutput:self.captureVideoDataOutput];
+        }
+        
+        
         AVCaptureVideoPreviewLayer *previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.captureSession];
         [self.captureSession startRunning];
         
@@ -104,10 +130,29 @@ static STPCameraManager  *sharedManager = nil;
 - (void)dealloc
 {
     [self.motionManager stopAccelerometerUpdates];
+    [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:UIApplicationDidEnterBackgroundNotification];
+    [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:UIApplicationDidBecomeActiveNotification];
     //[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] removeObserver:self forKeyPath:@"adjustingExposure"];
     //[[AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo] removeObserver:self forKeyPath:@"adjustingFocus"];
     self.operationQueue = nil;
     self.motionManager = nil;
+}
+
+- (void)applicationDidEnterBackground
+{
+    if (self.captureSession) {
+        [self.captureSession stopRunning];
+    }
+}
+
+- (void)applicationWillResignActive
+{
+    if (self.isReady) {
+        if (self.captureSession) {
+            [self.captureSession startRunning];
+        }
+
+    }
 }
 
 #pragma mark - Element
@@ -470,6 +515,27 @@ static STPCameraManager  *sharedManager = nil;
         }
     }
     return pointOfInterest;
+}
+
+#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
+
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
+{
+    
+    
+    CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CFDictionaryRef attachments = CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
+    CIImage *image = [[CIImage alloc] initWithCVImageBuffer:pixelBuffer options:(__bridge NSDictionary<NSString *,id> * _Nullable)(attachments)];
+    if (attachments) {
+        CFRelease(attachments);
+    }
+
+    NSArray *features = [_faceDetector featuresInImage:image options:@{CIDetectorImageOrientation: [NSNumber numberWithInt:6]}]; //FIXME
+    CMFormatDescriptionRef formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer);
+    CGRect aperture = CMVideoFormatDescriptionGetCleanAperture(formatDescription, false);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.delegate cameraManager:self didDetectionFeatures:features aperture:aperture];
+    });
 }
 
 #pragma mark - Location manager

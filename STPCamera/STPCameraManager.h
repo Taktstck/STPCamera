@@ -10,18 +10,21 @@
 @import AVFoundation;
 @import CoreMotion;
 @import CoreLocation;
+@import CoreImage;
+@import CoreVideo;
 @import ImageIO;
 @import Photos;
 @import MobileCoreServices;
 
 @protocol STPCameraManagerDelegate;
-@interface STPCameraManager : NSObject <CLLocationManagerDelegate>
+@interface STPCameraManager : NSObject <CLLocationManagerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
 
 @property (nonatomic, weak) id <STPCameraManagerDelegate> delegate;
 
-@property (nonatomic) AVCaptureSession *captureSession;
-@property (nonatomic) AVCaptureDeviceInput *captureDeviceInput;
-@property (nonatomic) AVCaptureStillImageOutput *captureStillImageOutput;
+@property (nonatomic, readonly) AVCaptureSession *captureSession;
+@property (nonatomic, readonly) AVCaptureDeviceInput *captureDeviceInput;
+@property (nonatomic, readonly) AVCaptureStillImageOutput *captureStillImageOutput;
+@property (nonatomic, readonly) AVCaptureVideoDataOutput *captureVideoDataOutput;
 
 @property (nonatomic, readonly) UIDeviceOrientation deviceOrientation;
 @property (nonatomic, readonly) UIInterfaceOrientation interfaceOrientation;
@@ -55,6 +58,7 @@
 - (void)cameraManager:(STPCameraManager *)cameraManager didFailWithError:(NSError *)error;
 - (void)cameraManager:(STPCameraManager *)cameraManager didChangeCaptureDevicePosition:(AVCaptureDevicePosition)devicePosition;
 - (void)cameraManager:(STPCameraManager *)cameraManager didChangeFlashMode:(AVCaptureFlashMode)flashMode;
+- (void)cameraManager:(STPCameraManager *)cameraManager didDetectionFeatures:(NSArray <CIFaceFeature *>*)features aperture:(CGRect)aperture;
 //- (void)cameraManager:(STPCameraManager *)cameraManager didOptimizeFocus:(BOOL)focus expose:(BOOL)expose; //FIXME
 
 @end
