@@ -581,20 +581,20 @@ static CGFloat kbottomToolbarHeight = 80;
     CGFloat heightScaleBy = previewBox.size.height / aperture.size.width;
     
     [CATransaction begin];
-    [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+    //[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
     
     NSMutableArray *trackingLayer = @[].mutableCopy;
 
     [features enumerateObjectsUsingBlock:^(CIFaceFeature * _Nonnull faceFeature, NSUInteger idx, BOOL * _Nonnull stop) {
         if (faceFeature.hasTrackingID) {
             [CATransaction begin];
-            [CATransaction setAnimationDuration:0.1f];
+            [CATransaction setAnimationDuration:0.5f];
             NSString *name = [@(faceFeature.trackingID) stringValue];
             CAShapeLayer *layer = (CAShapeLayer *)[subLayers layerForName:name];
             if (!layer) {
                 layer = [CAShapeLayer layer];
                 layer.name = name;
-                layer.lineWidth = 2.0f;
+                layer.lineWidth = 1.0f;
                 layer.strokeColor = [UIColor colorWithRed:1 green:1 blue:0.5 alpha:1].CGColor;
                 layer.fillColor = [UIColor clearColor].CGColor;
                 [self.faceLayer addSublayer:layer];
