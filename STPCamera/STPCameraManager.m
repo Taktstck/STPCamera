@@ -521,8 +521,6 @@ static STPCameraManager  *sharedManager = nil;
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-    
-    
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CFDictionaryRef attachments = CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
     CIImage *image = [[CIImage alloc] initWithCVImageBuffer:pixelBuffer options:(__bridge NSDictionary<NSString *,id> * _Nullable)(attachments)];

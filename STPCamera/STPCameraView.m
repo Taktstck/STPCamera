@@ -581,7 +581,7 @@ static CGFloat kbottomToolbarHeight = 80;
     CGFloat heightScaleBy = previewBox.size.height / aperture.size.width;
     
     [CATransaction begin];
-    //[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+    [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
     
     NSMutableArray *trackingLayer = @[].mutableCopy;
 
