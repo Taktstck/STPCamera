@@ -25,6 +25,8 @@
 @property (nonatomic) BOOL isReady;
 @property (nonatomic) BOOL isReadyLocationManager;
 
+@property (nonatomic) CIDetector *faceDetector;
+
 @end
 
 static STPCameraManager  *sharedManager = nil;
@@ -33,6 +35,7 @@ static STPCameraManager  *sharedManager = nil;
 {
     dispatch_queue_t videoDataOutputQueue;
     NSInteger _frameCount;
+    NSUInteger _priviousExifOrientation;
 }
 
 + (instancetype)sharedManager
@@ -49,6 +52,7 @@ static STPCameraManager  *sharedManager = nil;
 {
     self = [super init];
     if (self) {
+        _priviousExifOrientation = 0;
         _frameCount = 0;
         _isReady = NO;
         _isReadyLocationManager = NO;
@@ -173,6 +177,18 @@ static STPCameraManager  *sharedManager = nil;
     _locationManager.distanceFilter = kCLDistanceFilterNone;
     _locationManager.delegate = self;
     return _locationManager;
+}
+
+- (CIDetector *)faceDetector
+{
+    if (_faceDetector) {
+        return _faceDetector;
+    }
+    _faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace
+                                       context:nil
+                                       options:@{CIDetectorAccuracy: CIDetectorAccuracyLow,
+                                                 CIDetectorTracking: @YES}];
+    return _faceDetector;
 }
 
 #pragma mark - util
@@ -517,11 +533,11 @@ static STPCameraManager  *sharedManager = nil;
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-    if (_frameCount % 10 != 0) {
+    if (_frameCount % FRAME_COUNT != 0) {
         _frameCount ++;
         return;
     }
-    _frameCount ++;
+    _frameCount = 0;
     
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CFDictionaryRef attachments = CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
@@ -529,19 +545,23 @@ static STPCameraManager  *sharedManager = nil;
     if (attachments) {
         CFRelease(attachments);
     }
+    
     if ([self devicePosition] == AVCaptureDevicePositionFront) {
         CGAffineTransform transform = CGAffineTransformMakeScale(1, -1);
-        transform = CGAffineTransformTranslate(transform, 0, -image.extent.size.height);
         image = [image imageByApplyingTransform:transform];
+        CGAffineTransform translation = CGAffineTransformMakeTranslation(0, image.extent.size.height);
+        image = [image imageByApplyingTransform:translation];
     }
+
     UIImageOrientation imageOrientation = [self currentImageOrientation];
     NSUInteger exifOrientation = [self exifOrientation:imageOrientation];
-    CIDetector *faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace
-                                       context:nil
-                                       options:@{CIDetectorAccuracy: CIDetectorAccuracyLow,
-                                                 CIDetectorTracking: @YES}];
     
-    NSArray *features = [faceDetector featuresInImage:image options:@{CIDetectorImageOrientation: @(exifOrientation)}];
+    if (_priviousExifOrientation != exifOrientation) {
+        _faceDetector = nil;
+    }
+    _priviousExifOrientation = exifOrientation;
+
+    NSArray *features = [self.faceDetector featuresInImage:image options:@{CIDetectorImageOrientation: @(exifOrientation)}];
     CMFormatDescriptionRef formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer);
     CGRect aperture = CMVideoFormatDescriptionGetCleanAperture(formatDescription, false);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -566,10 +586,10 @@ static STPCameraManager  *sharedManager = nil;
             orientation = 6;
             break;
         case UIImageOrientationUpMirrored:
-            orientation = 2;
+            orientation = 4;
             break;
         case UIImageOrientationDownMirrored:
-            orientation = 4;
+            orientation = 2;
             break;
         case UIImageOrientationLeftMirrored:
             orientation = 5;

@@ -16,6 +16,8 @@
 @import Photos;
 @import MobileCoreServices;
 
+#define FRAME_COUNT 5
+
 @protocol STPCameraManagerDelegate;
 @interface STPCameraManager : NSObject <CLLocationManagerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
 

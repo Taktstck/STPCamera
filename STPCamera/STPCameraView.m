@@ -581,8 +581,6 @@ static CGFloat kbottomToolbarHeight = 80;
     CGFloat heightScaleBy = previewBox.size.height / aperture.size.width;
     
     [CATransaction begin];
-    //[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
-    
     NSMutableArray *trackingLayer = @[].mutableCopy;
 
     [features enumerateObjectsUsingBlock:^(CIFaceFeature * _Nonnull faceFeature, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -590,13 +588,13 @@ static CGFloat kbottomToolbarHeight = 80;
             [CATransaction begin];
             [CATransaction setAnimationDuration:0.5f];
             NSString *name = [@(faceFeature.trackingID) stringValue];
-            CAShapeLayer *layer = (CAShapeLayer *)[subLayers layerForName:name];
+            CALayer *layer = [subLayers layerForName:name];
             if (!layer) {
                 layer = [CAShapeLayer layer];
                 layer.name = name;
-                layer.lineWidth = 1.0f;
-                layer.strokeColor = [UIColor colorWithRed:1 green:1 blue:0.5 alpha:1].CGColor;
-                layer.fillColor = [UIColor clearColor].CGColor;
+                layer.cornerRadius = 8.0f;
+                layer.borderWidth = 1.0f;
+                layer.borderColor = [UIColor colorWithRed:1 green:1 blue:0.5 alpha:1].CGColor;
                 [self.faceLayer addSublayer:layer];
             }
             CGRect faceRect = [faceFeature bounds];
@@ -610,8 +608,7 @@ static CGFloat kbottomToolbarHeight = 80;
             faceRect.size.height *= heightScaleBy;
             faceRect.origin.x *= widthScaleBy;
             faceRect.origin.y *= heightScaleBy;
-            UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:faceRect cornerRadius:8];
-            layer.path = path.CGPath;
+            layer.frame = faceRect;
             [trackingLayer addObject:layer];
             [CATransaction commit];
         }
