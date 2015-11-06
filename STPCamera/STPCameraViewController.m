@@ -9,7 +9,6 @@
 #import "STPCameraViewController.h"
 #import "STPCameraManager.h"
 #import "STPCameraView.h"
-#import "STPCameraPreviewController.h"
 
 
 @interface STPCameraViewController () <STPCameraManagerDelegate, STPCameraViewDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>
@@ -18,7 +17,6 @@
 @property (nonatomic) UIView *preview;
 
 @property (nonatomic) AVCaptureVideoPreviewLayer *captureVideoPreviewLayer;
-@property (nonatomic) STPCameraPreviewController *previewController;
 
 @end
 
@@ -115,16 +113,6 @@
     _cameraView = [[STPCameraView alloc] initWithFrame:self.view.bounds];
     _cameraView.delegate = self;
     return _cameraView;
-}
-
-- (STPCameraPreviewController *)previewController
-{
-    if (_previewController) {
-        return _previewController;
-    }
-    _previewController = [STPCameraPreviewController new];
-    _previewController.view.frame = UIEdgeInsetsInsetRect(self.view.bounds, UIEdgeInsetsMake(self.cameraView.topToolbar.bounds.size.height, 0, self.cameraView.bottomToolbar.bounds.size.height, 0));
-    return _previewController;
 }
 
 #pragma mark - STPCameraViewDelegate

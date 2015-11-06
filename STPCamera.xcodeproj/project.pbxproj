@@ -7,12 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1291CBED1BE5A5A90018B8D5 /* STPCameraPreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1291CBEC1BE5A5A90018B8D5 /* STPCameraPreviewController.m */; };
 		1291CBEF1BE5B06E0018B8D5 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1291CBEE1BE5B06E0018B8D5 /* Photos.framework */; };
-		1291CBF61BE5DA660018B8D5 /* CIImage+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 1291CBF11BE5DA660018B8D5 /* CIImage+Convenience.m */; };
-		1291CBF71BE5DA660018B8D5 /* NSIndexSet+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 1291CBF31BE5DA660018B8D5 /* NSIndexSet+Convenience.m */; };
-		1291CBF81BE5DA660018B8D5 /* UICollectionView+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 1291CBF51BE5DA660018B8D5 /* UICollectionView+Convenience.m */; };
-		1291CBFC1BE660270018B8D5 /* STPCameraPreviewGridViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1291CBFB1BE660270018B8D5 /* STPCameraPreviewGridViewCell.m */; };
 		12B296051BE4B390007BE458 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296041BE4B390007BE458 /* CoreLocation.framework */; };
 		12B296071BE4B397007BE458 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296061BE4B397007BE458 /* CoreMotion.framework */; };
 		12B296091BE4B39C007BE458 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296081BE4B39C007BE458 /* AVFoundation.framework */; };
@@ -29,17 +24,7 @@
 
 /* Begin PBXFileReference section */
 		128563411BEC8CFD004A1384 /* STPCamera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STPCamera.h; sourceTree = "<group>"; };
-		1291CBEB1BE5A5A90018B8D5 /* STPCameraPreviewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraPreviewController.h; sourceTree = "<group>"; };
-		1291CBEC1BE5A5A90018B8D5 /* STPCameraPreviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraPreviewController.m; sourceTree = "<group>"; };
 		1291CBEE1BE5B06E0018B8D5 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
-		1291CBF01BE5DA660018B8D5 /* CIImage+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CIImage+Convenience.h"; sourceTree = "<group>"; };
-		1291CBF11BE5DA660018B8D5 /* CIImage+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CIImage+Convenience.m"; sourceTree = "<group>"; };
-		1291CBF21BE5DA660018B8D5 /* NSIndexSet+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexSet+Convenience.h"; sourceTree = "<group>"; };
-		1291CBF31BE5DA660018B8D5 /* NSIndexSet+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSIndexSet+Convenience.m"; sourceTree = "<group>"; };
-		1291CBF41BE5DA660018B8D5 /* UICollectionView+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UICollectionView+Convenience.h"; sourceTree = "<group>"; };
-		1291CBF51BE5DA660018B8D5 /* UICollectionView+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UICollectionView+Convenience.m"; sourceTree = "<group>"; };
-		1291CBFA1BE660270018B8D5 /* STPCameraPreviewGridViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraPreviewGridViewCell.h; sourceTree = "<group>"; };
-		1291CBFB1BE660270018B8D5 /* STPCameraPreviewGridViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraPreviewGridViewCell.m; sourceTree = "<group>"; };
 		12B296041BE4B390007BE458 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		12B296061BE4B397007BE458 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		12B296081BE4B39C007BE458 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -83,12 +68,6 @@
 		1291CBF91BE60CC70018B8D5 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				1291CBF01BE5DA660018B8D5 /* CIImage+Convenience.h */,
-				1291CBF11BE5DA660018B8D5 /* CIImage+Convenience.m */,
-				1291CBF21BE5DA660018B8D5 /* NSIndexSet+Convenience.h */,
-				1291CBF31BE5DA660018B8D5 /* NSIndexSet+Convenience.m */,
-				1291CBF41BE5DA660018B8D5 /* UICollectionView+Convenience.h */,
-				1291CBF51BE5DA660018B8D5 /* UICollectionView+Convenience.m */,
 				12B296151BE4B771007BE458 /* NSDateFormatter+Exif.h */,
 				12B296161BE4B771007BE458 /* NSDateFormatter+Exif.m */,
 			);
@@ -125,10 +104,6 @@
 				12B2960D1BE4B3DD007BE458 /* STPCameraViewController.m */,
 				12B2960E1BE4B3DD007BE458 /* STPCameraView.h */,
 				12B2960F1BE4B3DD007BE458 /* STPCameraView.m */,
-				1291CBEB1BE5A5A90018B8D5 /* STPCameraPreviewController.h */,
-				1291CBEC1BE5A5A90018B8D5 /* STPCameraPreviewController.m */,
-				1291CBFA1BE660270018B8D5 /* STPCameraPreviewGridViewCell.h */,
-				1291CBFB1BE660270018B8D5 /* STPCameraPreviewGridViewCell.m */,
 				1291CBF91BE60CC70018B8D5 /* Categories */,
 				8C8CA1A21B540901009A6271 /* Assets.xcassets */,
 				8C8CA1A71B540901009A6271 /* Info.plist */,
@@ -288,13 +263,8 @@
 			files = (
 				12B296111BE4B3DD007BE458 /* STPCameraViewController.m in Sources */,
 				8C8CA19B1B540901009A6271 /* AppDelegate.m in Sources */,
-				1291CBF81BE5DA660018B8D5 /* UICollectionView+Convenience.m in Sources */,
-				1291CBED1BE5A5A90018B8D5 /* STPCameraPreviewController.m in Sources */,
-				1291CBFC1BE660270018B8D5 /* STPCameraPreviewGridViewCell.m in Sources */,
 				12B296121BE4B3DD007BE458 /* STPCameraView.m in Sources */,
-				1291CBF71BE5DA660018B8D5 /* NSIndexSet+Convenience.m in Sources */,
 				12B296171BE4B771007BE458 /* NSDateFormatter+Exif.m in Sources */,
-				1291CBF61BE5DA660018B8D5 /* CIImage+Convenience.m in Sources */,
 				8C8CA1981B540901009A6271 /* main.m in Sources */,
 				12B296101BE4B3DD007BE458 /* STPCameraManager.m in Sources */,
 			);
