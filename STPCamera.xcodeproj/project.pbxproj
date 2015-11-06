@@ -24,11 +24,11 @@
 		8C8CA1981B540901009A6271 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8CA1971B540901009A6271 /* main.m */; };
 		8C8CA19B1B540901009A6271 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8CA19A1B540901009A6271 /* AppDelegate.m */; };
 		8C8CA1A31B540901009A6271 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8C8CA1A21B540901009A6271 /* Assets.xcassets */; };
-		8C8CA1A61B540901009A6271 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8C8CA1A41B540901009A6271 /* LaunchScreen.storyboard */; };
 		DC30DA2E0D011D4E880DE0C1 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3F7708D5CEE6B9365779D80 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		128563411BEC8CFD004A1384 /* STPCamera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STPCamera.h; sourceTree = "<group>"; };
 		1291CBEB1BE5A5A90018B8D5 /* STPCameraPreviewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraPreviewController.h; sourceTree = "<group>"; };
 		1291CBEC1BE5A5A90018B8D5 /* STPCameraPreviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraPreviewController.m; sourceTree = "<group>"; };
 		1291CBEE1BE5B06E0018B8D5 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
@@ -59,7 +59,6 @@
 		8C8CA1991B540901009A6271 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		8C8CA19A1B540901009A6271 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		8C8CA1A21B540901009A6271 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8C8CA1A51B540901009A6271 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8C8CA1A71B540901009A6271 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C3F7708D5CEE6B9365779D80 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -119,6 +118,7 @@
 			children = (
 				8C8CA1991B540901009A6271 /* AppDelegate.h */,
 				8C8CA19A1B540901009A6271 /* AppDelegate.m */,
+				128563411BEC8CFD004A1384 /* STPCamera.h */,
 				12B2960A1BE4B3DD007BE458 /* STPCameraManager.h */,
 				12B2960B1BE4B3DD007BE458 /* STPCameraManager.m */,
 				12B2960C1BE4B3DD007BE458 /* STPCameraViewController.h */,
@@ -131,7 +131,6 @@
 				1291CBFB1BE660270018B8D5 /* STPCameraPreviewGridViewCell.m */,
 				1291CBF91BE60CC70018B8D5 /* Categories */,
 				8C8CA1A21B540901009A6271 /* Assets.xcassets */,
-				8C8CA1A41B540901009A6271 /* LaunchScreen.storyboard */,
 				8C8CA1A71B540901009A6271 /* Info.plist */,
 				8C8CA1961B540901009A6271 /* Supporting Files */,
 			);
@@ -228,7 +227,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C8CA1A61B540901009A6271 /* LaunchScreen.storyboard in Resources */,
 				8C8CA1A31B540901009A6271 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -303,17 +301,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		8C8CA1A41B540901009A6271 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8C8CA1A51B540901009A6271 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		8C8CA1A81B540901009A6271 /* Debug */ = {
