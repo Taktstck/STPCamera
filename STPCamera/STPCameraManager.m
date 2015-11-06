@@ -642,8 +642,8 @@ static STPCameraManager  *sharedManager = nil;
             return;
         }
         
-        UIDeviceOrientation newDeviceOrientation;
-        UIInterfaceOrientation newInterfaceOrientation;
+        UIDeviceOrientation newDeviceOrientation = _deviceOrientation;
+        UIInterfaceOrientation newInterfaceOrientation = _interfaceOrientation;
         CMAcceleration acceleration = accelerometerData.acceleration;
         
         float xx = -acceleration.x;
