@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "STPCamera"
-  s.version      = "0.1.0"
+  s.version      = "0.1.1"
   s.summary      = "The camera."
   s.homepage     = "https://github.com/Taktstck/STPCamera"
   #s.screenshots	 = ""
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios, "8.0"
   s.ios.deployment_target = "8.0"
 
-  s.source       = { :git => "https://github.com/Taktstck/STPCamera.git", :tag => "0.1.0" }
+  s.source       = { :git => "https://github.com/Taktstck/STPCamera.git", :tag => "0.1.1" }
   s.source_files  = ["STPCamera/STPCameraManager.{h,m}", "STPCamera/STPCameraView.{h,m}", "STPCamera/STPCamera.h"]
   s.exclude_files = ["STPCamera/AppDelegate.*", "STPCamera/main.m" ]
   s.public_header_files = "STPCamera/**/*.h"
