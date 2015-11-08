@@ -12,7 +12,6 @@
 		12B296071BE4B397007BE458 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296061BE4B397007BE458 /* CoreMotion.framework */; };
 		12B296091BE4B39C007BE458 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296081BE4B39C007BE458 /* AVFoundation.framework */; };
 		12B296101BE4B3DD007BE458 /* STPCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B2960B1BE4B3DD007BE458 /* STPCameraManager.m */; };
-		12B296111BE4B3DD007BE458 /* STPCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B2960D1BE4B3DD007BE458 /* STPCameraViewController.m */; };
 		12B296121BE4B3DD007BE458 /* STPCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B2960F1BE4B3DD007BE458 /* STPCameraView.m */; };
 		12B296141BE4B471007BE458 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12B296131BE4B471007BE458 /* ImageIO.framework */; };
 		12B296171BE4B771007BE458 /* NSDateFormatter+Exif.m in Sources */ = {isa = PBXBuildFile; fileRef = 12B296161BE4B771007BE458 /* NSDateFormatter+Exif.m */; };
@@ -30,8 +29,6 @@
 		12B296081BE4B39C007BE458 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		12B2960A1BE4B3DD007BE458 /* STPCameraManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraManager.h; sourceTree = "<group>"; };
 		12B2960B1BE4B3DD007BE458 /* STPCameraManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraManager.m; sourceTree = "<group>"; };
-		12B2960C1BE4B3DD007BE458 /* STPCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraViewController.h; sourceTree = "<group>"; };
-		12B2960D1BE4B3DD007BE458 /* STPCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraViewController.m; sourceTree = "<group>"; };
 		12B2960E1BE4B3DD007BE458 /* STPCameraView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPCameraView.h; sourceTree = "<group>"; };
 		12B2960F1BE4B3DD007BE458 /* STPCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STPCameraView.m; sourceTree = "<group>"; };
 		12B296131BE4B471007BE458 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
@@ -100,8 +97,6 @@
 				128563411BEC8CFD004A1384 /* STPCamera.h */,
 				12B2960A1BE4B3DD007BE458 /* STPCameraManager.h */,
 				12B2960B1BE4B3DD007BE458 /* STPCameraManager.m */,
-				12B2960C1BE4B3DD007BE458 /* STPCameraViewController.h */,
-				12B2960D1BE4B3DD007BE458 /* STPCameraViewController.m */,
 				12B2960E1BE4B3DD007BE458 /* STPCameraView.h */,
 				12B2960F1BE4B3DD007BE458 /* STPCameraView.m */,
 				1291CBF91BE60CC70018B8D5 /* Categories */,
@@ -261,7 +256,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				12B296111BE4B3DD007BE458 /* STPCameraViewController.m in Sources */,
 				8C8CA19B1B540901009A6271 /* AppDelegate.m in Sources */,
 				12B296121BE4B3DD007BE458 /* STPCameraView.m in Sources */,
 				12B296171BE4B771007BE458 /* NSDateFormatter+Exif.m in Sources */,
