@@ -572,6 +572,7 @@ static CGFloat kbottomToolbarHeight = 80;
     //描画領域の取得
     CGSize parentFrameSize = [self bounds].size;
     NSString *gravity = [previewLayer videoGravity];
+    BOOL isMirrored = [previewLayer.connection isVideoMirrored];
     CGRect previewBox = [self videoPreviewBoxForGravity:gravity
                                               frameSize:parentFrameSize
                                            apertureSize:aperture.size];
@@ -608,6 +609,11 @@ static CGFloat kbottomToolbarHeight = 80;
             faceRect.size.height *= heightScaleBy;
             faceRect.origin.x *= widthScaleBy;
             faceRect.origin.y *= heightScaleBy;
+            if (isMirrored) {
+                faceRect = CGRectOffset(faceRect, previewBox.origin.x + previewBox.size.width - faceRect.size.width - (faceRect.origin.x * 2), previewBox.origin.y);
+            } else {
+                faceRect = CGRectOffset(faceRect, previewBox.origin.x, previewBox.origin.y);
+            }
             layer.frame = faceRect;
             [trackingLayer addObject:layer];
             [CATransaction commit];
@@ -626,36 +632,42 @@ static CGFloat kbottomToolbarHeight = 80;
 
 - (CGRect)videoPreviewBoxForGravity:(NSString *)gravity frameSize:(CGSize)frameSize apertureSize:(CGSize)apertureSize
 {
-
     CGFloat apertureRatio = apertureSize.height / apertureSize.width;
     CGFloat viewRatio = frameSize.width / frameSize.height;
     
     CGSize size = CGSizeZero;
-    if([gravity isEqualToString:AVLayerVideoGravityResizeAspect]) {
-        if(viewRatio > apertureRatio){
+    if ([gravity isEqualToString:AVLayerVideoGravityResizeAspectFill]) {
+        if (viewRatio > apertureRatio) {
+            size.width = frameSize.width;
+            size.height = apertureSize.width * (frameSize.width / apertureSize.height);
+        } else {
             size.width = apertureSize.height * (frameSize.height / apertureSize.width);
             size.height = frameSize.height;
-        }else{
+        }
+    } else if ([gravity isEqualToString:AVLayerVideoGravityResizeAspect]) {
+        if (viewRatio > apertureRatio) {
+            size.width = apertureSize.height * (frameSize.height / apertureSize.width);
+            size.height = frameSize.height;
+        } else {
             size.width = frameSize.width;
             size.height = apertureSize.width * (frameSize.width / apertureSize.height);
         }
-    } else if ([gravity isEqualToString:AVLayerVideoGravityResizeAspectFill]) {
-        size = frameSize;
-    }
-        
-    CGRect videoBox;
-    videoBox.size = size;
-    if(size.width < frameSize.width){
-        videoBox.origin.x = (frameSize.width - size.width) / 2;
-    }else{
-        videoBox.origin.x = (size.width - frameSize.width) / 2;
+    } else if ([gravity isEqualToString:AVLayerVideoGravityResize]) {
+        size.width = frameSize.width;
+        size.height = frameSize.height;
     }
     
-    if(size.height < frameSize.height){
+    CGRect videoBox;
+    videoBox.size = size;
+    if (size.width < frameSize.width)
+        videoBox.origin.x = (frameSize.width - size.width) / 2;
+    else
+        videoBox.origin.x = (size.width - frameSize.width) / 2;
+    
+    if ( size.height < frameSize.height )
         videoBox.origin.y = (frameSize.height - size.height) / 2;
-    }else{
+    else
         videoBox.origin.y = (size.height - frameSize.height) / 2;
-    }
     
     return videoBox;
 }

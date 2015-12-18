@@ -36,6 +36,7 @@ static STPCameraManager  *sharedManager = nil;
     dispatch_queue_t videoDataOutputQueue;
     NSInteger _frameCount;
     NSUInteger _priviousExifOrientation;
+    BOOL _isUsingFrontFacingCamera;
 }
 
 + (instancetype)sharedManager
@@ -56,6 +57,7 @@ static STPCameraManager  *sharedManager = nil;
         _frameCount = 0;
         _isReady = NO;
         _isReadyLocationManager = NO;
+        _isUsingFrontFacingCamera = NO;
         _processing = NO;
         _deviceOrientation = UIDeviceOrientationPortrait;
         _interfaceOrientation = UIInterfaceOrientationPortrait;
@@ -271,9 +273,11 @@ static STPCameraManager  *sharedManager = nil;
         switch (devicePosition) {
             case AVCaptureDevicePositionFront:
                 deviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontCamera] error:&error];
+                _isUsingFrontFacingCamera = YES;
                 break;
             case AVCaptureDevicePositionBack:
                 deviceInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backCamera] error:&error];
+                _isUsingFrontFacingCamera = NO;
                 break;
             case AVCaptureDevicePositionUnspecified:
             default:
@@ -533,6 +537,7 @@ static STPCameraManager  *sharedManager = nil;
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    
     if (_frameCount % FRAME_COUNT != 0) {
         _frameCount ++;
         return;
@@ -544,13 +549,6 @@ static STPCameraManager  *sharedManager = nil;
     CIImage *image = [[CIImage alloc] initWithCVImageBuffer:pixelBuffer options:(__bridge NSDictionary<NSString *,id> * _Nullable)(attachments)];
     if (attachments) {
         CFRelease(attachments);
-    }
-    
-    if ([self devicePosition] == AVCaptureDevicePositionFront) {
-        CGAffineTransform transform = CGAffineTransformMakeScale(1, -1);
-        image = [image imageByApplyingTransform:transform];
-        CGAffineTransform translation = CGAffineTransformMakeTranslation(0, image.extent.size.height);
-        image = [image imageByApplyingTransform:translation];
     }
 
     UIImageOrientation imageOrientation = [self currentImageOrientation];
@@ -567,6 +565,7 @@ static STPCameraManager  *sharedManager = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.delegate cameraManager:self didDetectionFeatures:features aperture:aperture];
     });
+    
 }
 
 - (NSUInteger)exifOrientation:(UIImageOrientation)imageOrientation
