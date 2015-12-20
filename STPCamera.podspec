@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = "8.0"
 
   s.source       = { :git => "https://github.com/Taktstck/STPCamera.git", :tag => "0.2.1" }
-  s.source_files  = ["STPCamera/STPCameraManager.*","STPCamera/STPCameraView.*", "STPCamera/NSDateFormatter+Exif.*"]
+  s.source_files  = ["STPCamera/STPCamera.h","STPCamera/STPCameraManager.*","STPCamera/STPCameraView.*", "STPCamera/NSDateFormatter+Exif.*"]
   s.public_header_files = "STPCamera/**/*.h"
   s.frameworks	= ["ImageIO", "AVFoundation", "CoreMotion", "CoreLocation"]
   s.dependency "pop", "~> 1.0"
