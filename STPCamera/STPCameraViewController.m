@@ -231,6 +231,7 @@
                                 [request setLocation:location];
                             } completionHandler:^(BOOL success, NSError *error) {
                                 if (success) {
+                                    NSLog(@"location %@", location);
                                     NSLog(@"%s add location data success", __PRETTY_FUNCTION__);
                                 }
                             }];

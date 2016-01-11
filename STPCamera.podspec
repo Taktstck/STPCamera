@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "STPCamera"
-  s.version      = "0.2.3"
+  s.version      = "0.2.4"
   s.summary      = "The camera."
   s.homepage     = "https://github.com/Taktstck/STPCamera"
   #s.screenshots	 = ""

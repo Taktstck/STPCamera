@@ -148,18 +148,28 @@ static STPCameraManager  *sharedManager = nil;
 
 - (void)applicationDidEnterBackground
 {
+    [self stopRunning];
+}
+
+- (void)applicationWillResignActive
+{
+    [self startRunning];
+}
+
+- (void)stopRunning
+{
     if (self.captureSession) {
         [self.captureSession stopRunning];
     }
 }
 
-- (void)applicationWillResignActive
+- (void)startRunning
 {
     if (self.isReady) {
         if (self.captureSession) {
             [self.captureSession startRunning];
         }
-
+        
     }
 }
 

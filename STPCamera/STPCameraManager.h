@@ -43,6 +43,8 @@
 
 + (instancetype)sharedManager;
 - (void)requestAuthorization;
+- (void)stopRunning;
+- (void)startRunning;
 - (void)setupAVCaptureCompletionHandler:(void (^)(AVCaptureVideoPreviewLayer *previewLayer))handler;
 - (void)terminate;
 
