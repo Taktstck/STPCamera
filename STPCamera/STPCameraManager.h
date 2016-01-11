@@ -42,6 +42,7 @@
 
 
 + (instancetype)sharedManager;
+- (void)requestAuthorization;
 - (void)setupAVCaptureCompletionHandler:(void (^)(AVCaptureVideoPreviewLayer *previewLayer))handler;
 - (void)terminate;
 

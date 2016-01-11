@@ -49,6 +49,12 @@ static STPCameraManager  *sharedManager = nil;
     return sharedManager;
 }
 
+- (void)requestAuthorization
+{
+    [self startLocationManager];
+    [self startMotionManager];
+}
+
 - (instancetype)init
 {
     self = [super init];
@@ -606,11 +612,7 @@ static STPCameraManager  *sharedManager = nil;
 
 - (void)startLocationManager
 {
-    if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
-        [self.locationManager requestAlwaysAuthorization];
-    } else {
-        [self.locationManager startUpdatingLocation];
-    }
+    [self.locationManager requestAlwaysAuthorization];
 }
 
 - (void)locationManager:(nonnull CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
